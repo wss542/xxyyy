@@ -26,17 +26,17 @@
 <body>
 <div class="wrap">
   <h1>♟️ 棋类游戏 · 免费跨地区联机部署指南</h1>
-  <p class="sub">和异地朋友联机有两种方式：<b>① 点对点直连（推荐，完全不用部署）</b>；② 自建中继服务器（更稳，适合长期开房）。</p>
+  <p class="sub">和异地朋友联机有两种方式：<b>① 经公共 MQTT 中继（推荐，完全不用部署）</b>；② 自建中继服务器（更稳，适合长期开房）。</p>
 
-  <div class="ok">✅ 默认就是方式 ①：双方都打开 <code>games.html</code>（双击即可，不用服务器、不用银行卡、不用装任何工具），一方「创建房间」拿到房间码，另一方输码「加入房间」即可。两端直接联网，房间码经 PeerJS 免费公共信令交换。</div>
+  <div class="ok">✅ 默认就是方式 ①：双方都打开 <code>games.html</code>（双击即可，不用服务器、不用银行卡、不用装任何工具），一方「创建房间」拿到房间码，另一方输码「加入房间」即可。房间码经 EMQX 公共 MQTT 中继转发，纯 WebSocket，无需 WebRTC/STUN。</div>
 
   <div class="card">
-    <h3 style="margin-top:0">方式 ①：点对点直连（最省事，免部署）</h3>
+    <h3 style="margin-top:0">方式 ①：经公共 MQTT 中继（最省事，免部署）</h3>
     <div class="step"><span class="num">1</span><div>你和朋友<b>各自用浏览器打开 <code>games.html</code></b>（直接双击文件即可；需能联网，用以连接信令服务器）。</div></div>
     <div class="step"><span class="num">2</span><div>选同一种棋（如「中国象棋」），点左侧「联机」。</div></div>
     <div class="step"><span class="num">3</span><div>一方点<b>「创建房间」</b>，屏幕上出现 5 位<b>房间码</b>；把它发给朋友（可点「复制」）。</div></div>
     <div class="step"><span class="num">4</span><div>朋友在「房间码」框输入该码，点<b>「加入房间」</b>。连接成功即可对弈。</div></div>
-    <div class="warn">⚠️ 偶尔公共信令会慢或连不上：刷新页面重试，或换一个房间码重开即可。若想要 7×24 稳定公网房间，见下方方式 ②。</div>
+    <div class="warn">⚠️ 偶尔公共 MQTT 中继会慢或连不上：刷新页面重试，或换一个房间码重开即可。若想要 7×24 稳定公网房间，见下方方式 ②。</div>
   </div>
 
   <div class="ok">💡 想长期挂着、或两端网络都连不上公共信令时，才需要方式 ②（部署一个免费中继服务器）。下面步骤仍有效，但<b>不是必须的</b>。</div>
