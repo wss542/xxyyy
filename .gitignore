@@ -1,0 +1,6 @@
+# 仅部署所需文件入仓，避免把本地/隐私文件推上去
+.DS_Store
+.workbuddy/
+node_modules/
+*.log
+start-server.command

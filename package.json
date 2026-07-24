@@ -1,0 +1,13 @@
+{
+  "name": "chess-games-online-server",
+  "version": "1.0.0",
+  "description": "棋类游戏联机中继服务器（零依赖 Node，可免费部署到 Render/Railway 等平台，实现跨地区联机）",
+  "main": "lan-server.js",
+  "scripts": {
+    "start": "node lan-server.js"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "private": true
+}

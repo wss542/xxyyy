@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>棋类游戏 · 免费跨地区联机部署指南</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:#1f2430;background:#f5f7fa;line-height:1.7}
+  .wrap{max-width:860px;margin:0 auto;padding:24px 18px 60px}
+  h1{font-size:24px;margin:0 0 4px}
+  .sub{color:#6b7280;margin:0 0 22px;font-size:14px}
+  .card{background:#fff;border:1px solid #e5e8ef;border-radius:14px;padding:20px 22px;margin:16px 0;box-shadow:0 1px 3px rgba(20,30,60,.05)}
+  .step{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px dashed #eceff5}
+  .step:last-child{border-bottom:0}
+  .num{flex:0 0 30px;height:30px;border-radius:50%;background:#3b6fe0;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+  .step b{color:#1f2430}
+  code{background:#eef1f7;padding:2px 6px;border-radius:6px;font-size:13px;color:#b3376b}
+  .term{display:block;background:#0f1729;color:#cfe3ff;padding:12px 14px;border-radius:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;white-space:pre-wrap;margin:8px 0;overflow:auto}
+  .warn{background:#fff7e6;border:1px solid #ffd591;border-radius:10px;padding:12px 14px;color:#8a5a00;font-size:14px;margin:12px 0}
+  .ok{background:#eafff1;border:1px solid #9be3b0;color:#166534;border-radius:10px;padding:12px 14px;font-size:14px;margin:12px 0}
+  svg{width:100%;height:auto;display:block;background:#fbfcfe;border:1px solid #e5e8ef;border-radius:12px;margin:8px 0}
+  .pill{display:inline-block;background:#eef1f7;color:#3b6fe0;border-radius:999px;padding:2px 10px;font-size:12px;margin:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>♟️ 棋类游戏 · 免费跨地区联机部署指南</h1>
+  <p class="sub">把 <code>lan-server.js</code> 部署到免费 Node 托管平台（Render / Railway），本机无需安装任何额外工具，即可和异地朋友联机。</p>
+
+  <div class="ok">✅ 本方案免费、纯网页操作；房间码机制不变，朋友输 5 位码即可加入。</div>
+
+  <div class="card">
+    <h3 style="margin-top:0">整体流程</h3>
+    <svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+      <defs>
+        <marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#3b6fe0"/>
+        </marker>
+      </defs>
+      <rect x="14" y="70" width="150" height="60" rx="10" fill="#eaf0ff" stroke="#3b6fe0"/>
+      <text x="89" y="95" text-anchor="middle" font-size="13" fill="#1f2430">① 三个文件</text>
+      <text x="89" y="113" text-anchor="middle" font-size="11" fill="#6b7280">lan-server.js</text>
+      <text x="89" y="126" text-anchor="middle" font-size="11" fill="#6b7280">games.html · package.json</text>
+
+      <rect x="210" y="70" width="160" height="60" rx="10" fill="#eaf0ff" stroke="#3b6fe0"/>
+      <text x="290" y="95" text-anchor="middle" font-size="13" fill="#1f2430">② 推到 GitHub</text>
+      <text x="290" y="113" text-anchor="middle" font-size="11" fill="#6b7280">网页上建仓库</text>
+      <text x="290" y="126" text-anchor="middle" font-size="11" fill="#6b7280">git push 一键脚本</text>
+
+      <rect x="416" y="70" width="170" height="60" rx="10" fill="#e9fff0" stroke="#16a34a"/>
+      <text x="501" y="95" text-anchor="middle" font-size="13" fill="#166534">③ 平台部署</text>
+      <text x="501" y="113" text-anchor="middle" font-size="11" fill="#15803d">Render/Railway</text>
+      <text x="501" y="126" text-anchor="middle" font-size="11" fill="#15803d">关联仓库 → Deploy</text>
+
+      <rect x="612" y="70" width="56" height="60" rx="10" fill="#fff7e6" stroke="#d97706"/>
+      <text x="640" y="100" text-anchor="middle" font-size="12" fill="#b45309">④ 得</text>
+      <text x="640" y="116" text-anchor="middle" font-size="11" fill="#b45309">https</text>
+      <text x="640" y="130" text-anchor="middle" font-size="11" fill="#b45309">地址</text>
+
+      <line x1="164" y1="100" x2="208" y2="100" stroke="#3b6fe0" stroke-width="2" marker-end="url(#ar)"/>
+      <line x1="370" y1="100" x2="414" y2="100" stroke="#3b6fe0" stroke-width="2" marker-end="url(#ar)"/>
+      <line x1="586" y1="100" x2="610" y2="100" stroke="#3b6fe0" stroke-width="2" marker-end="url(#ar)"/>
+
+      <text x="340" y="180" text-anchor="middle" font-size="12" fill="#6b7280">你和朋友都打开这个 https 地址 → 选棋 → 联机 → 创建/加入房间码</text>
+    </svg>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">部署步骤（以 Render 为例）</h3>
+
+    <div class="step"><div class="num">1</div><div>
+      <b>准备 GitHub 仓库。</b>打开 <a href="https://github.com/new" target="_blank" rel="noopener">github.com/new</a>（网页），仓库名随便起（如 <code>chess-online</code>），<b>不要</b>勾选「Add a README」(我们已有文件)。创建后复制仓库的 <code>https://github.com/你的用户名/仓库名.git</code> 地址。
+    </div></div>
+
+    <div class="step"><div class="num">2</div><div>
+      <b>一键推送到 GitHub。</b>在本机终端进入本文件夹，运行我们提供的脚本（把地址换成你的）：
+      <code class="term">bash push-to-github.sh https://github.com/你的用户名/仓库名.git</code>
+      首次会让你登录 GitHub（输入用户名 + 个人访问令牌 Token，密码不行）。推送成功后仓库里就有三个文件。
+    </div></div>
+
+    <div class="step"><div class="num">3</div><div>
+      <b>在 Render 部署。</b>打开 <a href="https://dashboard.render.com/" target="_blank" rel="noopener">dashboard.render.com</a> → <b>New → Web Service</b> → 关联刚才的 GitHub 仓库 → 配置：
+      <div style="margin-top:6px">
+        <span class="pill">Runtime: Node</span>
+        <span class="pill">Build Command: 留空</span>
+        <span class="pill">Start Command: npm start</span>
+        <span class="pill">Instance: Free</span>
+      </div>
+      点 <b>Deploy</b>，约 1–2 分钟构建完成。
+    </div></div>
+
+    <div class="step"><div class="num">4</div><div>
+      <b>拿到地址，开玩。</b>部署完成后 Render 给出 <code>https://xxxx.onrender.com</code>。把它发给你朋友。<b>双方都打开这个地址</b> → 选棋类 → 点「联机」→ 一方「创建房间」拿到 5 位房间码，另一方输码「加入」。
+    </div></div>
+  </div>
+
+  <div class="warn">⏱️ <b>免费层会休眠：</b>Render Free 在空闲约 15 分钟后会休眠，<b>第一次有人打开时需要等约 30–60 秒唤醒</b>，之后就正常了。若介意，可改用 Railway（免费额度通常不休眠，但需绑定支付方式做身份验证）。</div>
+
+  <div class="ok">🔒 <b>关于加密：</b>平台地址是 https，前端会自动用 <code>wss://</code> 连服务器，平台在边缘做加密并转发明文 ws，<b>你无需配置任何证书</b>。</div>
+
+  <div class="card">
+    <h3 style="margin-top:0">换 Railway 也行</h3>
+    <p style="margin:0 0 8px">步骤几乎一样：<a href="https://railway.app/new" target="_blank" rel="noopener">railway.app/new</a> → 关联 GitHub 仓库 → 选 Node → Deploy。Railway 会自动识别 <code>package.json</code> 的 <code>npm start</code>，无需手动填命令。</p>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">本地临时自测（可选）</h3>
+    <p style="margin:0">部署前想先确认服务器能跑，在本文件夹执行：</p>
+    <code class="term">node lan-server.js</code>
+    <p style="margin:6px 0 0">然后用浏览器开 <code>http://localhost:8787/</code> 即可（仅本机/同 WiFi 可用，跨地区还是要走上面的部署）。</p>
+  </div>
+</div>
+</body>
+</html>
