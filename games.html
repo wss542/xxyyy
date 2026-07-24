@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>棋类游戏 · 中国象棋 / 五子棋 / 国际象棋 / 飞行棋 / 跳棋 / 围棋</title>
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
   :root { --board:#f0c98b; --line:#5a3a1a; --red:#c0392b; --black:#2c3e50; --panel:#faf3e6; }
   * { box-sizing: border-box; }
@@ -206,17 +207,14 @@
     </div>
     <div id="onlinePanel" class="subpanel" style="display:none">
       <div class="row">
-        <label>局域网联机（两人对战）</label>
+        <label>互联网联机（两人对战 · 点对点直连）</label>
         <div class="onl-box">
           <div class="onl-conn" id="netConn"><span class="dot"></span><span id="netConnText">未连接</span></div>
           <div class="onl-warn" id="netWarn"></div>
           <div class="onl-room" id="netRoomBox">
             <div>房间码（告诉对方输入这个）：</div>
             <div class="big" id="netRoomCode">------</div>
-            <div class="tip">把此码发给对方，对方在「房间码」框输入后点「加入房间」即可开始。</div>
-          </div>
-          <div class="onl-row">
-            <input id="netServer" placeholder="远程联机填 ws://或 wss://公网地址:8787" value="">
+            <div class="tip">把此码发给对方，对方在「房间码」框输入后点「加入房间」即可开始。双方需选同一棋类，且都能联网。</div>
           </div>
           <div class="onl-row">
             <button class="btn btn-primary" id="netCreate" style="margin:0;flex:1">创建房间</button>
@@ -226,7 +224,7 @@
             <input id="netCode" placeholder="输入房间码加入" maxlength="6" style="text-transform:uppercase">
             <button class="btn btn-ghost" id="netCopy" style="margin:0;flex:0 0 auto;padding:8px 14px">复制</button>
           </div>
-          <div class="onl-status" id="netStatus">进入联机后，电脑点「创建房间」、手机输入房间码点「加入房间」。双方需选同一棋类。</div>
+          <div class="onl-status" id="netStatus">进入联机后，一方点「创建房间」拿到房间码，另一方输入房间码点「加入房间」。双方需选同一棋类。</div>
           <div class="onl-row"><button class="btn btn-ghost" id="netLeave" style="margin:0;flex:1">断开连接</button></div>
         </div>
       </div>
@@ -1436,7 +1434,7 @@ function netInputAllowed(){
   return onlineMyTurn();                          // 仅自己的回合可操作
 }
 function netAfterMove(){ if(ctrl.online.enabled && ctrl.online.connected) sendNet({t:'state', game:ctrl.game, s: current().net.get()}); }
-function sendNet(obj){ const ws=ctrl.online.ws; if(ws && ws.readyState===1) ws.send(JSON.stringify(obj)); }
+function sendNet(obj){ if(conn && conn.open) conn.send(JSON.stringify(obj)); }
 function setNetStatus(t){ const el=$('netStatus'); if(el) el.textContent=t; }
 function setNetConn(state, text){ const c=$('netConn'); if(!c) return; c.className='onl-conn '+(state||''); const t=$('netConnText'); if(t) t.textContent=text; }
 function showNetWarn(html){ const w=$('netWarn'); if(!w) return; w.innerHTML=html; w.classList.add('show'); }
@@ -1453,43 +1451,62 @@ function applyOnlineSetup(role){
   else if(g==='aero'){ ctrl.aero.players=2; ctrl.aero.aiCount=0; const me=role==='host'?'red':'yellow', op=role==='host'?'yellow':'red'; ctrl.aero.humanTeams=[me,op]; ctrl.online.myColor=me; }
   else if(g==='checkers'){ ctrl.checkers.players=2; ctrl.checkers.aiCount=0; ctrl.checkers.humanTeams=[0,3]; ctrl.online.myColor = role==='host'?0:3; ctrl.online.mySeat = role==='host'?0:1; }
 }
-// 根据页面协议与用户输入，归一并校正 ws/wss 方案（跨地区部署到 https 平台时为必需）
-function normalizeWsUrl(raw){
-  let url = (raw||'').trim();
-  const wantSsl = location.protocol==='https:';
-  const scheme = wantSsl ? 'wss://' : 'ws://';
-  if(!/^wss?:\/\//i.test(url)){ url = scheme + url; }            // 没写方案 → 用页面协议
-  else if(wantSsl && /^ws:\/\//i.test(url)){ url = 'wss://'+url.slice(5); }   // https 页不能用 ws（混合内容）→ 升级
-  else if(!wantSsl && /^wss:\/\//i.test(url)){ url = 'ws://'+url.slice(6); } // http 页连不了 tls → 降级
-  return url;
+// 点对点直连（WebRTC，经 PeerJS 免费公共信令）——两端直接连，无需任何服务器/部署/银行卡
+let peer=null, conn=null;
+function genRoomCode(){ const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s=''; for(let i=0;i<5;i++) s+=c[Math.floor(Math.random()*c.length)]; return s; }
+function setupConn(){
+  if(!conn) return;
+  conn.on('open', ()=>{
+    if(ctrl.online.role!=='host'){ ctrl.online.role='guest'; applyOnlineSetup('guest'); refresh(); }
+    ctrl.online.connected=true;
+    setNetConn('ok','已连接');
+    setNetStatus(ctrl.online.role==='host' ? '对手已加入！轮到你时直接落子即可。' : '已加入房间 '+ctrl.online.room+'，对局开始！');
+  });
+  conn.on('data', (raw)=>{ try{ const m=JSON.parse(raw); if(m.t==='state'){ if(m.game===ctrl.game) current().net.set(m.s); } }catch(e){} });
+  conn.on('close', ()=>{ if(ctrl.online.connected){ ctrl.online.connected=false; hideRoomBox(); setNetConn('bad','对手已离开'); setNetStatus('对手已离开，连接断开。可点「创建房间」重开。'); } });
+  conn.on('error', ()=>{ setNetConn('bad','连接出错'); });
 }
-function netConnect(onOpen){
-  const url = normalizeWsUrl($('netServer').value) || (location.protocol==='https:'?'wss://':'ws://')+(location.hostname||'127.0.0.1')+':8787';
-  $('netServer').value = url;
-  // 已连接则直接复用
-  if(ctrl.online.ws && ctrl.online.ws.readyState===1){ if(onOpen) onOpen(); return; }
-  setNetConn('wait','正在连接服务器…');
-  try{
-    const ws = new WebSocket(url);
-    ctrl.online.ws = ws;
-    ws.onopen = ()=>{ setNetConn('ok','已连接服务器'); if(onOpen) onOpen(); };
-    ws.onmessage = (ev)=>{ try{ netOnMessage(JSON.parse(ev.data)); }catch(e){} };
-    ws.onclose = ()=>{ if(ctrl.online.connected){ ctrl.online.connected=false; setNetConn('bad','连接已断开'); setNetStatus('连接已关闭。'); hideRoomBox(); } else { setNetConn('bad','未连接到服务器'); } };
-    ws.onerror = ()=>{ setNetConn('bad','连接失败'); setNetStatus('连接失败：请确认 lan-server.js 已运行，且本页通过 http://<电脑IP>:8787 打开（不要用双击 file:// 打开）。'); };
-  }catch(e){ setNetConn('bad','连接失败'); setNetStatus('连接失败：'+e.message); }
+function startHost(){
+  if(typeof Peer==='undefined'){ setNetConn('bad','加载失败'); setNetStatus('无法加载联机库（PeerJS）。请检查网络后刷新页面重试。'); return; }
+  const code=genRoomCode();
+  setNetConn('wait','正在创建房间…'); setNetStatus('正在创建房间 '+code+' …');
+  try{ peer=new Peer(code); }catch(e){ setNetConn('bad','创建失败'); setNetStatus('创建房间失败：'+e.message); return; }
+  peer.on('open', ()=>{
+    ctrl.online.role='host'; ctrl.online.room=code;
+    applyOnlineSetup('host'); refresh(); showRoomBox(code);
+    setNetConn('ok','房间已创建'); setNetStatus('房间已创建（'+code+'），等待对手加入…把房间码告诉对方');
+  });
+  peer.on('connection', (c)=>{
+    if(conn && conn!==c){ try{ conn.close(); }catch(_){} }
+    conn=c; setupConn();
+    if(ctrl.online.role!=='host'){ ctrl.online.role='host'; applyOnlineSetup('host'); refresh(); showRoomBox(code); }
+  });
+  peer.on('error', (e)=>{
+    if(e && e.type==='unavailable-id'){ if(peer){ try{ peer.destroy(); }catch(_){} } startHost(); return; } // 房间码被占用 → 换一个重试
+    setNetConn('bad','连接失败'); setNetStatus('联机失败：'+(e&&e.type?e.type:e)+'。请刷新页面重试。');
+  });
+  peer.on('disconnected', ()=>{ try{ peer.reconnect(); }catch(_){} });
+}
+function startGuest(code){
+  if(typeof Peer==='undefined'){ setNetConn('bad','加载失败'); setNetStatus('无法加载联机库（PeerJS）。请检查网络后刷新页面重试。'); return; }
+  code=(code||'').toUpperCase();
+  setNetConn('wait','正在加入房间…'); setNetStatus('正在加入房间 '+code+' …');
+  try{ peer=new Peer(); }catch(e){ setNetConn('bad','加入失败'); setNetStatus('加入失败：'+e.message); return; }
+  peer.on('open', ()=>{
+    try{ conn=peer.connect(code, {reliable:true}); }catch(e){ setNetConn('bad','加入失败'); setNetStatus('加入失败：'+e.message); return; }
+    setupConn();
+  });
+  peer.on('error', (e)=>{
+    setNetConn('bad','加入失败');
+    setNetStatus('加入房间 '+code+' 失败：'+(e&&e.type?e.type:e)+'。请确认房间码正确，且对方已点「创建房间」。');
+  });
 }
 function netLeave(){
-  const ws=ctrl.online.ws; if(ws){ try{ ws.close(); }catch(e){} }
-  ctrl.online.ws=null; ctrl.online.connected=false; ctrl.online.enabled=false; ctrl.online.role=null; ctrl.online.room=null; ctrl.online.myColor=null; ctrl.online.mySeat=null;
-  hideRoomBox(); setNetConn('bad','未连接到服务器'); setNetStatus('已断开。可重新点「创建房间」或「加入房间」。');
-}
-function netOnMessage(m){
-  if(m.t==='created'){ ctrl.online.role='host'; ctrl.online.room=m.code; applyOnlineSetup('host'); refresh(); showRoomBox(m.code); setNetConn('ok','已连接服务器'); setNetStatus('房间已创建，等待对手加入…（把上面的房间码告诉对方）'); }
-  else if(m.t==='peer'){ ctrl.online.connected=true; setNetStatus('对手已加入！轮到你时直接落子即可。'); }
-  else if(m.t==='paired'){ ctrl.online.role='guest'; ctrl.online.room=m.code; ctrl.online.connected=true; applyOnlineSetup('guest'); refresh(); setNetConn('ok','已连接服务器'); setNetStatus('已加入房间 '+m.code+'，对局开始！'); }
-  else if(m.t==='state'){ if(m.game===ctrl.game) current().net.set(m.s); }
-  else if(m.t==='left'){ ctrl.online.connected=false; hideRoomBox(); setNetConn('bad','对手已离开'); setNetStatus('对手已离开，连接断开。可点「创建房间」重开。'); }
-  else if(m.t==='err'){ ctrl.online.connected=false; hideRoomBox(); setNetConn('bad','出错'); setNetStatus('错误：'+m.msg); }
+  if(conn){ try{ conn.close(); }catch(e){} }
+  if(peer){ try{ peer.destroy(); }catch(e){} }
+  peer=null; conn=null;
+  ctrl.online.enabled=false; ctrl.online.connected=false; ctrl.online.role=null; ctrl.online.room=null; ctrl.online.myColor=null; ctrl.online.mySeat=null;
+  hideRoomBox(); setNetConn('bad','未连接'); setNetStatus('已断开。可重新点「创建房间」或「加入房间」。');
 }
 
 let game = XQ;
@@ -1615,9 +1632,8 @@ $('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); i
   if(v!=='online' && ctrl.online.enabled) netLeave();
   ctrl.mode=v; $('modeSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
   if(v==='online'){
-    if(location.protocol==='file:'){ showNetWarn('⚠️ <b>当前用本地文件打开，手机无法连上你。</b><br>请改用电脑上运行 <b>start-server.command</b>（或 <b>node lan-server.js</b>），然后用浏览器打开 <b>http://&lt;电脑局域网IP&gt;:8787/</b>（手机也开这个地址）。电脑自身可用 <b>http://localhost:8787/</b>。'); }
-    else hideNetWarn();
-    netConnect();
+    hideNetWarn();
+    setNetStatus('联机模式（点对点直连，无需服务器）：点「创建房间」生成房间码发给对方，或输入对方房间码点「加入房间」。双方需选同一棋类，且都能联网。');
   }
   if(ctrl.game==='checkers'){ syncCheckers(); buildCcTeamPickers(); } refresh(); });
 $('diffSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const v=+b.dataset.v; if(v===ctrl.difficulty){ return; } ctrl.difficulty=v; $('diffSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); if(ctrl.mode!=='online'){ $('log').innerHTML=''; $('undoBtn').disabled=true; game.init(); } });
@@ -1639,13 +1655,12 @@ $('restartBtn').addEventListener('click',()=>{ $('log').innerHTML=''; $('undoBtn
 $('undoBtn').addEventListener('click',()=>{ if(ctrl.online.enabled) return; game.undo(); });
 $('passBtn').addEventListener('click',()=>{ if(ctrl.game==='weiqi' && WG) WG._t.passMove(); });
 $('flipBtn').addEventListener('click',()=>{ ctrl.flipManual=!ctrl.flipManual; $('flipBtn').classList.toggle('on', ctrl.flipManual); setHint(ctrl.flipManual ? '已手动翻转棋盘朝向（再点恢复）' : hints[ctrl.game]); current().render(); });
-$('netCreate').addEventListener('click',()=>{ ctrl.mode='online'; netConnect(()=>sendNet({t:'create', game:ctrl.game})); });
-$('netJoin').addEventListener('click',()=>{ const code=($('netCode').value||'').trim().toUpperCase(); if(!code){ setNetStatus('请输入房间码'); return; } ctrl.online.room=code; ctrl.mode='online'; netConnect(()=>sendNet({t:'join', code, game:ctrl.game})); });
+$('netCreate').addEventListener('click',()=>{ ctrl.mode='online'; startHost(); });
+$('netJoin').addEventListener('click',()=>{ const code=($('netCode').value||'').trim().toUpperCase(); if(!code){ setNetStatus('请输入房间码'); return; } ctrl.online.room=code; ctrl.mode='online'; startGuest(code); });
 $('netCopy').addEventListener('click',()=>{ const code=$('netCode').value; if(navigator.clipboard&&code){ navigator.clipboard.writeText(code).then(()=>setNetStatus('房间码已复制：'+code),()=>setNetStatus('房间码：'+code)); } else { setNetStatus('房间码：'+code); } });
 $('netLeave').addEventListener('click',()=>{ netLeave(); ctrl.mode='ai'; refresh(); });
 
 setHint(hints.xiangqi);
-try{ $('netServer').value = (location.protocol==='https:'?'wss://':'ws://')+(location.hostname||'127.0.0.1')+':8787'; }catch(e){}
 refresh();
 showHome();
 function showHome(){ $('home').style.display='flex'; }
