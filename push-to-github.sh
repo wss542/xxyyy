@@ -26,7 +26,9 @@ if [ -n "$TOKEN" ]; then
   # 临时把 token 写进地址做一次推送，推完移除，避免 token 留在 git 配置
   PUSH_URL="https://${TOKEN}@${REPO#https://}"
   git remote add origin "$PUSH_URL"
-  git push -u origin main
+  # 若远端已有 GitHub 自动生成的初始提交(README 等)，先 fetch 再强制推送覆盖（本仓库为新建，安全）
+  git fetch origin 2>/dev/null || true
+  git push -u origin main --force-with-lease
   git remote set-url origin "$REPO"
   echo ""
   echo "✅ 已推送到 $REPO（token 已自动从本地配置移除）"
