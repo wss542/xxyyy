@@ -1488,7 +1488,7 @@ function mqttConnect(role, code){
   mqClient = client;
   const topic = mqttTopic(code,'s');
   client.on('connect', ()=>{
-    setNetConn('ok','已连接中继');
+    setNetConn('ok','已连中继·等对手');
     ctrl.online.role=role;   // 先设角色，确保订阅后收到的保留消息能被正确识别为对手状态
     client.subscribe(topic, {qos:0}, (err)=>{ if(err) setNetStatus('订阅失败：'+err.message); });
     if(role==='host'){
@@ -1506,7 +1506,11 @@ function mqttConnect(role, code){
     if(m.from===ctrl.online.role) return;
     if(m.t==='state'){
       if(m.game===ctrl.game) current().net.set(m.s);
-      if(!ctrl.online.connected){ ctrl.online.connected=true; setNetConn('ok','已连接'); setNetStatus(ctrl.online.role==='host'?'对手已加入！轮到你时直接落子即可。':'已加入房间 '+code+'，对局开始！'); }
+      if(!ctrl.online.connected){
+        ctrl.online.connected=true; setNetConn('ok','已连接');
+        setNetStatus(ctrl.online.role==='host'?'对手已加入！轮到你时直接落子即可。':'已加入房间 '+code+'，对局开始！');
+        if(ctrl.online.role==='guest') publishState(); // 客机加入后主动 ping 主机，让主机也显示「已连接」
+      }
     } else if(m.t==='leave'){ ctrl.online.connected=false; hideRoomBox(); setNetConn('bad','对手已离开'); setNetStatus('对手已离开，连接断开。可点「创建房间」重开。'); }
   });
   client.on('error', (e)=>{ setNetConn('bad','连接出错'); setNetStatus('中继错误：'+(e&&e.message||e)+'。可刷新重试，或在「信令地址」换成可达的 broker。'); });
