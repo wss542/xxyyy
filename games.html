@@ -1490,10 +1490,10 @@ function mqttConnect(role, code){
   client.on('connect', ()=>{
     setNetConn('ok','已连中继·等对手');
     ctrl.online.role=role;   // 先设角色，确保订阅后收到的保留消息能被正确识别为对手状态
-    client.subscribe(topic, {qos:0}, (err)=>{ if(err) setNetStatus('订阅失败：'+err.message); });
+    client.subscribe(topic, {qos:1}, (err)=>{ if(err) setNetStatus('订阅失败：'+err.message); });
     if(role==='host'){
       ctrl.online.room=code; applyOnlineSetup('host'); refresh(); showRoomBox(code);
-      setNetStatus('房间已创建（'+code+'），等待对手加入…把房间码告诉对方');
+      setNetStatus('房间已创建（'+code+'），等待对手加入…把房间码告诉对方（双方都要用同一最新版 games.html，对方旧版不会 ping，你将一直停在「等对手」）');
       publishState(true);
     } else {
       ctrl.online.room=code; applyOnlineSetup('guest'); refresh(); showRoomBox(code);
@@ -1509,9 +1509,11 @@ function mqttConnect(role, code){
       if(!ctrl.online.connected){
         ctrl.online.connected=true; setNetConn('ok','已连接');
         setNetStatus(ctrl.online.role==='host'?'对手已加入！轮到你时直接落子即可。':'已加入房间 '+code+'，对局开始！');
-        if(ctrl.online.role==='guest') publishState(); // 客机加入后主动 ping 主机，让主机也显示「已连接」
+        if(ctrl.online.role==='guest') startGuestPing(); // 反复 ping 主机（QoS1+重试），确保主机也显示「已连接」
+        else publishAck(); // 主机收到客机首条状态 → 回 ack，让客机停止 ping
       }
-    } else if(m.t==='leave'){ ctrl.online.connected=false; hideRoomBox(); setNetConn('bad','对手已离开'); setNetStatus('对手已离开，连接断开。可点「创建房间」重开。'); }
+    } else if(m.t==='ack'){ stopGuestPing(); } // 客机收到主机 ack → 停止 ping
+    else if(m.t==='leave'){ ctrl.online.connected=false; hideRoomBox(); setNetConn('bad','对手已离开'); setNetStatus('对手已离开，连接断开。可点「创建房间」重开。'); }
   });
   client.on('error', (e)=>{ setNetConn('bad','连接出错'); setNetStatus('中继错误：'+(e&&e.message||e)+'。可刷新重试，或在「信令地址」换成可达的 broker。'); });
   client.on('close', ()=>{ if(ctrl.online.connected){ ctrl.online.connected=false; setNetConn('bad','已断开'); setNetStatus('与中继断开，可刷新重连。'); } });
@@ -1520,8 +1522,15 @@ function mqttConnect(role, code){
 function publishState(retain){
   if(!mqClient || !mqClient.connected || !ctrl.online.room) return;
   const msg = JSON.stringify({t:'state', game:ctrl.game, from:ctrl.online.role, s: current().net.get()});
-  mqClient.publish(mqttTopic(ctrl.online.room,'s'), msg, {qos:0, retain: !!retain});
+  mqClient.publish(mqttTopic(ctrl.online.room,'s'), msg, {qos:1, retain: !!retain});
 }
+function publishAck(){
+  if(!mqClient || !mqClient.connected || !ctrl.online.room) return;
+  mqClient.publish(mqttTopic(ctrl.online.room,'s'), JSON.stringify({t:'ack', from:'host'}), {qos:1, retain:false});
+}
+let __guestPingTimer=null;
+function startGuestPing(){ stopGuestPing(); let n=0; const tick=()=>{ publishState(); if(++n>=6) stopGuestPing(); }; tick(); __guestPingTimer=setInterval(tick, 800); }
+function stopGuestPing(){ if(__guestPingTimer){ clearInterval(__guestPingTimer); __guestPingTimer=null; } }
 function startHost(){
   const code=genRoomCode();
   setNetConn('wait','正在创建房间…'); setNetStatus('正在创建房间 '+code+' …');
@@ -1533,6 +1542,7 @@ function startGuest(code){
   mqttConnect('guest', code);
 }
 function netLeave(){
+  stopGuestPing();
   if(mqClient){ try{ mqClient.end(true); }catch(e){} mqClient=null; }
   ctrl.online.enabled=false; ctrl.online.connected=false; ctrl.online.role=null; ctrl.online.room=null; ctrl.online.myColor=null; ctrl.online.mySeat=null;
   hideRoomBox(); setNetConn('bad','未连接'); setNetStatus('已断开。可重新点「创建房间」或「加入房间」。');
