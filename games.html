@@ -316,7 +316,7 @@ const XQ = (function () {
                  black:{K:'将',A:'士',E:'象',H:'马',R:'车',C:'炮',P:'卒'} };
   const VAL = { K:10000, R:900, C:450, H:400, E:200, A:200, P:100 };
 
-  let board, turn, selected, legal, gameOver, history, aiThinking, flip=false;
+  let board, turn, selected, legal, gameOver, history, aiThinking, flip=false, lastMove=null;
 
   function inB(r,c){ return r>=0&&r<ROWS&&c>=0&&c<COLS; }
   function inPalace(side,r,c){ if(c<3||c>5) return false; return side==='red'?(r>=7&&r<=9):(r>=0&&r<=2); }
@@ -468,7 +468,15 @@ const XQ = (function () {
       if(has){ ctx.arc(cx(tc),cy(tr),R+3,0,Math.PI*2); ctx.strokeStyle='#1f8a4c'; ctx.lineWidth=3; ctx.stroke(); }
       else { ctx.arc(cx(tc),cy(tr),7,0,Math.PI*2); ctx.fillStyle='rgba(31,138,76,.75)'; ctx.fill(); }
     }
+    // 上一步高亮（起点 + 终点，半透明底色垫在棋子下）
+    if(lastMove){ const [fr,fc]=lastMove.from, [tr,tc]=lastMove.to;
+      ctx.fillStyle='rgba(230,126,34,.20)';
+      ctx.fillRect(cx(fc)-CELL/2, cy(fr)-CELL/2, CELL, CELL);
+      ctx.fillRect(cx(tc)-CELL/2, cy(tr)-CELL/2, CELL, CELL);
+    }
     for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const p=board[r][c]; if(p) drawPiece(r,c,p); }
+    // 终点橙色圆环（套在棋子上，醒目）
+    if(lastMove){ const [tr,tc]=lastMove.to; ctx.beginPath(); ctx.arc(cx(tc),cy(tr),R+4,0,Math.PI*2); ctx.strokeStyle='#e67e22'; ctx.lineWidth=3.5; ctx.stroke(); }
     if(selected){ const [sr,sc]=selected; ctx.beginPath(); ctx.arc(cx(sc),cy(sr),R+3,0,Math.PI*2); ctx.strokeStyle='#e67e22'; ctx.lineWidth=3.5; ctx.stroke(); }
   }
   function drawPalace(r0,r1){ ctx.beginPath(); ctx.moveTo(cx(3),cy(r0)); ctx.lineTo(cx(5),cy(r1)); ctx.moveTo(cx(5),cy(r0)); ctx.lineTo(cx(3),cy(r1)); ctx.stroke(); }
@@ -488,7 +496,7 @@ const XQ = (function () {
     board[2][1]={side:'black',type:'C'}; board[2][7]={side:'black',type:'C'};
     board[7][1]={side:'red',type:'C'}; board[7][7]={side:'red',type:'C'};
     for(let c=0;c<COLS;c+=2){ board[3][c]={side:'black',type:'P'}; board[6][c]={side:'red',type:'P'}; }
-    turn='red'; selected=null; legal=[]; gameOver=false; history=[]; aiThinking=false;
+    turn='red'; selected=null; legal=[]; gameOver=false; history=[]; aiThinking=false; lastMove=null;
     updateStatus('red'); render(); maybeAI();
   }
   function playerSide(){ return ctrl.playerColor.xiangqi; }
@@ -511,7 +519,7 @@ const XQ = (function () {
   function doMove(r,c,tr,tc){
     const moving=board[r][c], cap=board[tr][tc];
     history.push({r,c,tr,tc,piece:moving.type,side:moving.side,cap:cap?cap.type:null});
-    board[tr][tc]=moving; board[r][c]=null; selected=null; legal=[];
+    board[tr][tc]=moving; board[r][c]=null; selected=null; legal=[]; lastMove={from:[r,c],to:[tr,tc]};
     const opp=turn==='red'?'black':'red'; turn=opp;
     addLog(moving.side,moving.type,r,c,tr,tc,cap);
     if(inCheck(opp)){ if(!hasAnyLegalMove(opp)){ gameOver=true; updateStatus(opp,'mate',moving.side); }
@@ -540,6 +548,8 @@ const XQ = (function () {
     selected=null; legal=[]; gameOver=false;
     const log=$('log'); log.innerHTML='';
     for(const h of history){ const div=document.createElement('div'); div.innerHTML=`<span>${h.side==='red'?'红':'黑'}：${CHAR[h.side][h.piece]} ${colName(h.c)}→${colName(h.tc)}${h.cap?' 吃'+CHAR[h.side==='red'?'black':'red'][h.cap]:''}</span>`; log.appendChild(div); }
+    const lastH = history[history.length-1];
+    lastMove = lastH ? {from:[lastH.r,lastH.c], to:[lastH.tr,lastH.tc]} : null;
     updateStatus(turn); render();
     if(history.length===0) $('undoBtn').disabled=true;
   }
@@ -557,8 +567,8 @@ const XQ = (function () {
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
   return { init, undo, render, isBusy:()=>aiThinking, name:'xiangqi',
     net: {
-      get:()=>({ board, turn, gameOver }),
-      set:(s)=>{ board=s.board; turn=s.turn; gameOver=s.gameOver; selected=null; legal=[]; aiThinking=false; render(); updateStatus(turn); }
+      get:()=>({ board, turn, gameOver, lastMove }),
+      set:(s)=>{ board=s.board; turn=s.turn; gameOver=s.gameOver; lastMove=s.lastMove||null; selected=null; legal=[]; aiThinking=false; render(); updateStatus(turn); }
     }
   };
 })();
@@ -930,8 +940,8 @@ const CH = (function () {
   return { init, undo, render, isBusy:()=>aiThinking, name:'chess',
     _t:{ legalMoves, inCheck, aiPick, makeMove, undoMove, board:()=>board, getState:()=>state, setBoard:(bd,st)=>{board=bd; state=st;}, start },
     net: {
-      get:()=>({ board, state, gameOver, winner, turn: state.turn }),
-      set:(s)=>{ board=s.board; state=s.state; gameOver=s.gameOver; winner=s.winner; selected=null; legal=[]; aiThinking=false; render(); updateStatus(gameOver?'mate':null); }
+      get:()=>({ board, state, gameOver, winner, turn: state.turn, lastMove }),
+      set:(s)=>{ board=s.board; state=s.state; gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove||null; selected=null; legal=[]; aiThinking=false; render(); updateStatus(gameOver?'mate':null); }
     }
   };
 })();
@@ -1069,14 +1079,17 @@ const FL = (function () {
   function aiRoll(){ if(gameOver) return; rollDie(); }
   function rollDie(){ if(phase!=='roll'||gameOver) return; die=1+Math.floor(Math.random()*6); const color=currentColor();
     legalTokens=legalTokensFor(color,die); updateStatus(); render();
-    if(legalTokens.length===0){ addLog(color,'掷出 '+die+'，无子可走'); if(die===6) later(beginTurn,450); else later(advanceTurn,450); return; }
+    if(legalTokens.length===0){ addLog(color,'掷出 '+die+'，无子可走'); if(die===6) later(beginTurn,450); else later(()=>{ advanceTurn(); netAfterMove(); },450); return; }
     if(legalTokens.length===1){ later(()=>doMoveToken(legalTokens[0]),350); return; }
     if(!isHuman(color)){ const t=aiChooseToken(color,legalTokens,die,ctrl.difficulty); later(()=>doMoveToken(t),350); }
     else { phase='pick'; render(); }
     netAfterMove(); }
   function doMoveToken(ti){ pushHistory(); $('undoBtn').disabled=false; phase='busy'; const color=currentColor(); const before=planes[color][ti]; const np=moveToken(color,ti,die); lastMoveToken={color,ti};
     addLog(color,'掷'+die+' '+(before===-1?'起飞':(np===56?'到达终点!':'前进')));
-    if(gameOver){ updateStatus(); render(); netAfterMove(); return; } if(die===6) later(beginTurn,500); else later(advanceTurn,500); updateStatus(); render(); netAfterMove(); }
+    if(gameOver){ updateStatus(); render(); netAfterMove(); return; }
+    if(die===6) later(()=>{ beginTurn(); netAfterMove(); },500);
+    else later(()=>{ advanceTurn(); netAfterMove(); },500);
+    updateStatus(); render(); netAfterMove(); }
   function advanceTurn(){ turnIdx=(turnIdx+1)%turnOrder.length; beginTurn(); }
   function pushHistory(){ history.push(JSON.stringify({planes, turnIdx, die, phase, gameOver, winner, finishedList})); }
   function onClick(e){ if(gameOver||aiThinking) return; if(!netInputAllowed()) return; const color=currentColor(); if(!isHuman(color)) return;
@@ -1084,10 +1097,12 @@ const FL = (function () {
     if(phase==='pick'){ const t=pickTokenAt(e); if(t!=null && legalTokens.includes(t)) doMoveToken(t); } }
   function pickTokenAt(e){ const rect=canvas.getBoundingClientRect(); const x=(e.clientX-rect.left)*(W/rect.width), y=(e.clientY-rect.top)*(H/rect.height); const color=currentColor();
     for(const t of legalTokens){ const [cx2,cy2]=tokenCenter(color,t); if(Math.hypot(x-cx2,y-cy2)<=CELL*0.42) return t; } return null; }
-  function updateStatus(){ const color=currentColor(); const dot=$('turnDot'); dot.className='dot '+color; $('turnText').textContent=CN[color]+'方 '+(isHuman(color)?'（你）':'（AI）');
+  function updateStatus(){ const color=currentColor(); const dot=$('turnDot'); dot.className='dot '+color;
+    const mine = ctrl.mode==='online' ? (color===ctrl.online.myColor) : isHuman(color);
+    $('turnText').textContent=CN[color]+'方 '+(mine?'（你）':(ctrl.mode==='online'?'（对手）':'（AI）'));
     const st=$('status'); st.className='status';
     if(gameOver){ const ranked=finishedList.map(c=>CN[c]+'方'); st.textContent='🏁 已有 '+finishedList.length+' 队到达终点：'+ranked.join(' › ')+'（冠军 '+CN[winner]+'方）'; return; }
-    if(phase==='roll') st.textContent=(isHuman(color)?'点击棋盘掷骰子':'AI 掷骰子中…');
+    if(phase==='roll') st.textContent=(mine?'点击棋盘掷骰子':(ctrl.mode==='online'?'对手掷骰子中…':'AI 掷骰子中…'));
     else if(phase==='pick') st.textContent='选择要移动的棋子（点数 '+die+'）';
     else st.textContent='点数 '+die; }
   function addLog(color,text){ const log=$('log'); const d=document.createElement('div'); d.innerHTML='<span style="color:'+CC[color]+';font-weight:700">'+CN[color]+'</span>：'+text; log.appendChild(d); log.scrollTop=log.scrollHeight; }
@@ -1108,8 +1123,8 @@ const FL = (function () {
   return { init, undo, render, isBusy:()=>aiThinking, name:'aero',
     _t:{ coordOf, moveToken, legalTokensFor, aiChooseToken, planes:()=>planes, setPlanes:(o)=>{planes=o;}, getState:()=>({gameOver,winner,finished:finishedList}), getFinished:()=>finishedList, aiTeams, getTurnOrder:()=>turnOrder, START, LOOP, isOwnColorCell, isFlyLaunch, currentColor, humanColors, isHuman, getCfg:()=>ctrl.aero, getTurnIdx:()=>turnIdx, rollDie, doMoveToken, getPhase:()=>phase, getDie:()=>die, legalTokensNow:()=>legalTokens, getThinking:()=>aiThinking, getGameOver:()=>gameOver },
     net: {
-      get:()=>({ planes, turnIdx, die, phase, gameOver, winner, finishedList, mover:currentColor() }),
-      set:(s)=>{ planes=s.planes; turnIdx=s.turnIdx; die=s.die; phase=s.phase; gameOver=s.gameOver; winner=s.winner; finishedList=s.finishedList||[]; aiThinking=false; lastMoveToken=null; render(); updateStatus(); }
+      get:()=>({ planes, turnIdx, die, phase, gameOver, winner, finishedList, turn:currentColor(), mover:currentColor(), lastMoveToken }),
+      set:(s)=>{ planes=s.planes; turnIdx=s.turnIdx; die=s.die; phase=s.phase; gameOver=s.gameOver; winner=s.winner; finishedList=s.finishedList||[]; lastMoveToken=s.lastMoveToken||null; aiThinking=false; render(); updateStatus(); }
     }
   };
 })();
@@ -1288,8 +1303,8 @@ const CC = (function () {
       getGameOver:()=>gameOver, getWinner:()=>winner, getFinished:()=>finishedList, getTurnIdx:()=>turnIdx,
       setTurn:(i)=>{turnIdx=i;}, maybeAI, beginTurn, undo, init },
     net: {
-      get:()=>({ board, turnIdx, active, tgtMap, tgtApexMap, gameOver, winner, finishedList, mover:currentIdx() }),
-      set:(s)=>{ board=s.board; turnIdx=s.turnIdx; active=s.active; tgtMap=s.tgtMap; tgtApexMap=s.tgtApexMap; gameOver=s.gameOver; winner=s.winner; finishedList=s.finishedList||[]; selected=null; legal=[]; aiThinking=false; lastMove=null; render(); updateStatus(); }
+      get:()=>({ board, turnIdx, active, tgtMap, tgtApexMap, gameOver, winner, finishedList, mover:currentIdx(), lastMove }),
+      set:(s)=>{ board=s.board; turnIdx=s.turnIdx; active=s.active; tgtMap=s.tgtMap; tgtApexMap=s.tgtApexMap; gameOver=s.gameOver; winner=s.winner; finishedList=s.finishedList||[]; lastMove=s.lastMove||null; selected=null; legal=[]; aiThinking=false; render(); updateStatus(); }
     }
   };
 })();
