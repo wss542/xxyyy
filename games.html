@@ -282,7 +282,7 @@ const ctrl = {
   game: 'xiangqi',     // 'xiangqi' | 'gomoku' | 'chess' | 'aero' | 'checkers' | 'weiqi'
   mode: 'ai',          // 'ai' | 'pvp'
   difficulty: 2,       // 0..3
-  playerColor: { xiangqi: 'red', gomoku: 'black', chess: 'white', aero: 'red', weiqi: 'black' }, // 玩家执子
+  playerColor: { xiangqi: 'red', gomoku: 'black', chess: 'white', aero: 'red', weiqi: 'b' }, // 玩家执子（围棋用 b/w 与棋盘一致）
   aero: {
     players: 1,                       // 人类玩家人数 1/2/3/4
     aiCount: 3,                       // AI 队伍数量 0/1/2/3（与人类合计 2~4 队参战）
@@ -1360,7 +1360,7 @@ const WG = (function () {
   function aiMove(){ aiThinking=true; setStatus('AI 思考中…'); later(()=>{ const mv=aiPick(); aiThinking=false; if(!mv){ passMove(); return; } doMove(mv[0],mv[1]); }, 90); }
 
   function doMove(i,j){
-    if(gameOver||aiThinking||!isHumanTurn()) return;
+    if(gameOver||aiThinking) return;
     if(!netInputAllowed()) return;
     const c=turn, pre=clone(board);
     const res=tryMove(board,i,j,c);
@@ -1373,7 +1373,7 @@ const WG = (function () {
     turn=other(c); beginTurn(); netAfterMove();
   }
   function passMove(){
-    if(gameOver||aiThinking||!isHumanTurn()) return;
+    if(gameOver||aiThinking) return;
     if(!netInputAllowed()) return;
     pushHistory(); passes++; koRef=null; lastMove=null; addLog(turn,'虚手 (Pass)');
     if(passes>=2){ endGame(); netAfterMove(); return; }
