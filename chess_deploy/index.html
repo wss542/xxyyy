@@ -73,6 +73,8 @@ safe-buffer/index.js:
   .btn-primary { background:#c0392b; color:#fff; } .btn-primary:hover { background:#a93226; }
   .btn-ghost { background:#e7d6b8; color:#5a3a1a; } .btn-ghost:hover { background:#dcc39a; }
   .btn:disabled { opacity:.45; cursor:not-allowed; }
+  /* 行内小按钮：禁止继承 .btn 的 width:100%，否则 flex 行里会把输入框挤扁 */
+  #netCopy, #chatSend, #undoAccept, #undoDeny, #lobbyClose { width:auto; flex:0 0 auto; }
   .log-title { font-size:13px; color:#7a5a32; margin:8px 0 6px; font-weight:700; }
   #log { height:200px; overflow-y:auto; font-size:13px; background:#fff; border-radius:6px;
     padding:8px; line-height:1.7; color:#4a3a28; }
