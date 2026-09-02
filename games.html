@@ -112,9 +112,9 @@ safe-buffer/index.js:
     .menu-card .ds { min-height:0; }
   }
   /* ===== 联机面板 ===== */
-  .onl-box { background:#fff; border-radius:8px; padding:10px; }
-  .onl-row { display:flex; gap:8px; margin:6px 0; align-items:center; }
-  .onl-row input { flex:1; min-width:0; padding:8px; border:1px solid #d8c39a; border-radius:7px; font-size:14px; width:100%; color:#2c241b !important;background:#fff !important;-webkit-text-fill-color:#2c241b;}
+  .onl-box { background:#fff; border-radius:8px; padding:12px; overflow:visible; }
+  .onl-row { display:flex; gap:8px; margin:6px 0; align-items:center; flex-wrap:nowrap; }
+  .onl-row input { flex:1; min-width:0; padding:8px 10px; border:1px solid #d8c39a; border-radius:7px; font-size:14px; width:100%; color:#2c241b !important;background:#fff !important;-webkit-text-fill-color:#2c241b;box-sizing:border-box;}
   .onl-code { font-size:22px; font-weight:800; letter-spacing:4px; color:#c0392b; }
   .onl-status { font-size:13px; color:#7a5a32; min-height:18px; margin:4px 0; line-height:1.5; }
   #netCopy { flex:0 0 auto; padding:8px 14px; margin-bottom:0; }
@@ -144,10 +144,10 @@ safe-buffer/index.js:
   .onl-conn.ok .dot { background:#27ae60; }
   .onl-conn.bad .dot { background:#c0392b; }
   .onl-conn.wait .dot { background:#e0a800; }
-  .onl-room { display:none; background:#fdecea; border:1px solid #f5b7b1; border-radius:8px; padding:10px; margin:6px 0; text-align:center; }
+  .onl-room { display:none; background:#fdecea; border:1px solid #f5b7b1; border-radius:8px; padding:12px; margin:6px 0; text-align:center; }
   .onl-room.show { display:block; }
-  .onl-room .big { font-size:30px; font-weight:900; letter-spacing:6px; color:#c0392b; }
-  .onl-room .tip { font-size:12px; color:#7a5a32; margin-top:4px; }
+  .onl-room .big { font-size:30px; font-weight:900; letter-spacing:6px; color:#c0392b; line-height:1.3; }
+  .onl-room .tip { font-size:12px; color:#7a5a32; margin-top:4px; line-height:1.5; }
   .onl-warn { display:none; background:#fff4e0; border:1px solid #f0c36d; color:#8a5a00; border-radius:8px; padding:10px; font-size:13px; line-height:1.6; margin:6px 0; }
   .onl-warn.show { display:block; }
   .onl-warn b { color:#c0392b; }
@@ -186,6 +186,7 @@ safe-buffer/index.js:
   body.dark .menu-card .nm { color:#e8dcc4; }
   body.dark .menu-card .ds { color:#c9b48f; }
   body.dark .onl-box, body.dark #chatMsgs, body.dark .lobby-item, body.dark .onl-room, body.dark .onl-undo { background:#1c160e; border-color:#4a3a26; }
+  body.dark .onl-room .big { color:#e74c3c; }
   body.dark .onl-chat, body.dark .onl-movelog, body.dark .onl-lobby { border-top-color:#4a3a26; }
 body.dark .onl-row input { color:#e8dcc4; background:#2a2218; border-color:#4a3a26; ;-webkit-text-fill-color:#e8dcc4 !important;}
   body.dark .chat-msgs { background:#1c160e; border-color:#4a3a26; color:#e8dcc4; }
@@ -1137,12 +1138,12 @@ const FL = (function () {
   const CENTER=[7,7];
   const START_COORDS=COLORS.map(c=>LOOP[START[c]]);
   const cx=c=>MARGIN+c*CELL, cy=r=>MARGIN+r*CELL;
-  let planes, turnIdx, die, phase, selectedToken, legalTokens, gameOver, winner, history, aiThinking, lastMoveToken, gen, turnOrder, finishedList;
+  let planes, turnIdx, die, phase, selectedToken, legalTokens, gameOver, winner, history, aiThinking, lastMoveToken, lastMove, gen, turnOrder, finishedList;
 
   function start(){     planes={}; for(const col of COLORS) planes[col]=[-1,-1,-1,-1];
     turnOrder = COLORS.filter(c => isHuman(c) || aiTeams().includes(c));
     turnIdx = 0;
-    die=null; phase='roll'; selectedToken=null; legalTokens=[]; gameOver=false; winner=null; finishedList=[]; history=[]; aiThinking=false; lastMoveToken=null; gen=0; }
+    die=null; phase='roll'; selectedToken=null; legalTokens=[]; gameOver=false; winner=null; finishedList=[]; history=[]; aiThinking=false; lastMoveToken=null; lastMove=null; gen=0; }
   function coordOf(color, progress){ if(progress<0) return null; if(progress<=50) return LOOP[(START[color]+progress)%52]; return HOME[color][progress-51]; }
   function isOwnColorCell(color, progress){ return progress>0 && progress<=50 && (progress%4===0); }
   function isFlyLaunch(color, progress){ return progress===16; }
@@ -1249,7 +1250,7 @@ const FL = (function () {
   function isHuman(color){ return humanColors().includes(color); }
   function later(fn,ms){ const g=gen; setTimeout(()=>{ if(g===gen) fn(); }, ms); }
   function init(){ syncHumanTeams(); start(); $('log').innerHTML=''; beginTurn(); }
-  function beginTurn(){ phase='roll'; die=null; selectedToken=null; legalTokens=[]; lastMoveToken=null; const color=currentColor(); aiThinking=!isHuman(color); updateStatus(); if(!isHuman(color)) later(aiRoll,550); else render(); }
+  function beginTurn(){ phase='roll'; die=null; selectedToken=null; legalTokens=[]; lastMoveToken=null; lastMove=null; const color=currentColor(); aiThinking=!isHuman(color); updateStatus(); if(!isHuman(color)) later(aiRoll,550); else render(); }
   function aiRoll(){ if(gameOver) return; rollDie(); }
   function rollDie(){ if(phase!=='roll'||gameOver) return; die=1+Math.floor(Math.random()*6); const color=currentColor();
     legalTokens=legalTokensFor(color,die); updateStatus(); render();
@@ -1258,7 +1259,7 @@ const FL = (function () {
     if(!isHuman(color)){ const t=aiChooseToken(color,legalTokens,die,ctrl.difficulty); later(()=>doMoveToken(t),350); }
     else { phase='pick'; render(); }
     netAfterMove(); }
-  function doMoveToken(ti){ pushHistory(); $('undoBtn').disabled=false; phase='busy'; const color=currentColor(); const before=planes[color][ti]; const np=moveToken(color,ti,die); lastMoveToken={color,ti};
+  function doMoveToken(ti){ pushHistory(); $('undoBtn').disabled=false; phase='busy'; const color=currentColor(); const before=planes[color][ti]; const fromPos=tokenCenter(color,ti); const np=moveToken(color,ti,die); const toPos=tokenCenter(color,ti); lastMoveToken={color,ti}; lastMove={from:fromPos,to:toPos};
     addLog(color,'掷'+die+' '+(before===-1?'起飞':(np===56?'到达终点!':'前进')));
     if(gameOver){ updateStatus(); render(); netAfterMove(); return; }
     if(die===6) later(()=>{ beginTurn(); netAfterMove(); },500);
@@ -1287,7 +1288,7 @@ const FL = (function () {
       die=null; phase='roll';
       if(isHuman(currentColor())) break; }
     if(!restored) return;
-    selectedToken=null; legalTokens=[]; lastMoveToken=null;
+    selectedToken=null; legalTokens=[]; lastMoveToken=null; lastMove=null;
     const log=$('log'); log.innerHTML=''; updateStatus();
     const color=currentColor(); aiThinking=!isHuman(color); render();
     if(history.length===0) $('undoBtn').disabled=true; else $('undoBtn').disabled=false;
@@ -1297,8 +1298,8 @@ const FL = (function () {
   return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'aero',
     _t:{ coordOf, moveToken, legalTokensFor, aiChooseToken, planes:()=>planes, setPlanes:(o)=>{planes=o;}, getState:()=>({gameOver,winner,finished:finishedList}), getFinished:()=>finishedList, aiTeams, getTurnOrder:()=>turnOrder, START, LOOP, isOwnColorCell, isFlyLaunch, currentColor, humanColors, isHuman, getCfg:()=>ctrl.aero, getTurnIdx:()=>turnIdx, rollDie, doMoveToken, getPhase:()=>phase, getDie:()=>die, legalTokensNow:()=>legalTokens, getThinking:()=>aiThinking, getGameOver:()=>gameOver },
     net: {
-      get:()=>({ planes, turnIdx, die, phase, gameOver, winner, finishedList, turn:currentColor(), mover:currentColor(), lastMoveToken }),
-      set:(s)=>{ planes=s.planes; turnIdx=s.turnIdx; die=s.die; phase=s.phase; gameOver=s.gameOver; winner=s.winner; finishedList=s.finishedList||[]; lastMoveToken=s.lastMoveToken||null; history=[]; aiThinking=false; render(); updateStatus(); }
+      get:()=>({ planes, turnIdx, die, phase, gameOver, winner, finishedList, turn:currentColor(), mover:currentColor(), lastMoveToken, lastMove }),
+      set:(s)=>{ planes=s.planes; turnIdx=s.turnIdx; die=s.die; phase=s.phase; gameOver=s.gameOver; winner=s.winner; finishedList=s.finishedList||[]; lastMoveToken=s.lastMoveToken||null; lastMove=s.lastMove||null; history=[]; aiThinking=false; render(); updateStatus(); }
     }
   };
 })();
@@ -3390,7 +3391,7 @@ $('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); i
   }
   if(ctrl.game==='checkers'){ syncCheckers(); buildCcTeamPickers(); } refresh(); });
 $('diffSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const v=+b.dataset.v; if(v===ctrl.difficulty){ return; } ctrl.difficulty=v; $('diffSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); if(ctrl.mode!=='online'){ $('log').innerHTML=''; $('undoBtn').disabled=true; } });
-$('colorSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; let v=mapColor(ctrl.game,b.dataset.v); ctrl.playerColor[ctrl.game]=v; buildColorSeg(); if(ctrl.mode==='ai'){ refresh(); } else if(!current().net.get().gameOver){ current().render(); try{updateStatus();}catch(e){} } else { refresh(); } });
+$('colorSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; let v=mapColor(ctrl.game,b.dataset.v); ctrl.playerColor[ctrl.game]=v; buildColorSeg(); const s=current().net.get(); const started=s.lastMove!==undefined&&s.lastMove!==null; if(s.gameOver || !started){ refresh(); } else { current().render(); try{updateStatus();}catch(e){} } });
 // ===== 飞行棋专属控制 =====
 $('playersSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; ctrl.aero.players=+b.dataset.v; $('playersSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); syncHumanTeams(); buildTeamPickers(); refresh(); });
 $('aiSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; ctrl.aero.aiCount=+b.dataset.v; const seg=$('aiSeg'); seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); syncHumanTeams(); buildTeamPickers(); refresh(); });
