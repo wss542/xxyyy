@@ -114,7 +114,7 @@ safe-buffer/index.js:
   /* ===== 联机面板 ===== */
   .onl-box { background:#fff; border-radius:8px; padding:10px; }
   .onl-row { display:flex; gap:8px; margin:6px 0; align-items:center; }
-  .onl-row input { flex:1; min-width:0; padding:8px; border:1px solid #d8c39a; border-radius:7px; font-size:14px; width:100%; }
+  .onl-row input { flex:1; min-width:0; padding:8px; border:1px solid #d8c39a; border-radius:7px; font-size:14px; width:100%; color:#2c241b;background:#fff;}
   .onl-code { font-size:22px; font-weight:800; letter-spacing:4px; color:#c0392b; }
   .onl-status { font-size:13px; color:#7a5a32; min-height:18px; margin:4px 0; line-height:1.5; }
   #netCopy { flex:0 0 auto; padding:8px 14px; margin-bottom:0; }
@@ -187,6 +187,7 @@ safe-buffer/index.js:
   body.dark .menu-card .ds { color:#c9b48f; }
   body.dark .onl-box, body.dark #chatMsgs, body.dark .lobby-item, body.dark .onl-room, body.dark .onl-undo { background:#1c160e; border-color:#4a3a26; }
   body.dark .onl-chat, body.dark .onl-movelog, body.dark .onl-lobby { border-top-color:#4a3a26; }
+body.dark .onl-row input { color:#e8dcc4; background:#2a2218; border-color:#4a3a26; }
   body.dark .chat-msgs { background:#1c160e; border-color:#4a3a26; color:#e8dcc4; }
   body.dark .onl-score { background:#33291c; border-color:#4a3a26; color:#e8dcc4; }
   body.dark canvas { background:#3a2e1e; }
@@ -2775,6 +2776,7 @@ function netAfterMove(){
   const s=current().net.get();
   if(s){ REPLAY.snaps.push(deepClone(s)); if(REPLAY.snaps.length>500) REPLAY.snaps.shift(); playMoveSound(); if(s.gameOver && s.winner) playWinSound(s.winner); }
   if(ctrl.puzzle) checkPuzzleWin();
+  animLastMove();
 }
 const GAME_CANVAS = { xiangqi:'boardXQ', gomoku:'boardGO', chess:'boardCH', aero:'boardFL', checkers:'boardCC', weiqi:'boardWG', reversi:'boardRV', jungle:'boardJG', four:'boardFO', banqi:'boardBQ', ttt:'boardTT', backgammon:'boardBG' };
 let __animRAF=null;
@@ -2782,23 +2784,93 @@ function animLastMove(){
   if(typeof requestAnimationFrame!=='function') return;
   const g=ctrl.game, m=current(); if(!m||!m.cellCenter) return;
   const s=m.net.get(); if(!s||!s.lastMove) return;
-  let pos=null;
-  if(g==='backgammon'){ if(typeof s.lastMove==='number') pos=m.cellCenter(s.lastMove); }
-  else { const lm=s.lastMove; if(Array.isArray(lm)&&lm.length===2) pos=m.cellCenter(lm[0],lm[1]); }
-  if(!pos) return;
+  let fromPos=null, toPos=null;
+  // Determine from/to positions based on game type
+  if(g==='backgammon'){ if(typeof s.lastMove==='number') toPos=m.cellCenter(s.lastMove); }
+  else if(g==='four' || g==='gomoku' || g==='ttt' || g==='reversi' || g==='weiqi'){
+    const lm=s.lastMove; if(Array.isArray(lm)&&lm.length===2) toPos=m.cellCenter(lm[0],lm[1]);
+  }
+  else if(g==='xiangqi' || g==='chess' || g==='jungle' || g==='banqi'){
+    // These games have from/to in lastMove
+    const lm=s.lastMove; 
+    if(lm && lm.from && lm.to){
+      fromPos=(typeof lm.from[0]!=='undefined')?m.cellCenter(lm.from[0],lm.from[1]):null;
+      toPos=m.cellCenter(lm.to[0],lm.to[1]);
+    }
+    else if(Array.isArray(lm)&&lm.length===2){ toPos=m.cellCenter(lm[0],lm[1]); }
+  }
+  if(!toPos) return;
   const cv=$(GAME_CANVAS[g]); if(!cv) return; const xc=cv.getContext('2d');
   if(__animRAF) cancelAnimationFrame(__animRAF);
+  // If we have fromPos, do sliding animation; otherwise just pulse
+  if(fromPos && (Math.abs(fromPos.x-toPos.x)>5 || Math.abs(fromPos.y-toPos.y>5))){
+    animatePieceMove(fromPos, toPos, 180, ()=>{ __animRAF=null; });
+    return;
+  }
+  // Fallback: pulse animation at destination
   let t0=null; const dur=300;
   function frame(ts){ if(t0===null)t0=ts; const p=Math.min(1,(ts-t0)/dur);
     m.render();
     xc.save(); xc.globalAlpha=1-p; xc.strokeStyle='#e67e22'; xc.lineWidth=4;
-    xc.beginPath(); xc.arc(pos.x,pos.y,24+p*28,0,Math.PI*2); xc.stroke();
-    xc.globalAlpha=1-p*0.5; xc.fillStyle='#e67e22'; xc.beginPath(); xc.arc(pos.x,pos.y,20*(1-0.5*p),0,Math.PI*2); xc.fill();
+    xc.beginPath(); xc.arc(toPos.x,toPos.y,24+p*28,0,Math.PI*2); xc.stroke();
+    xc.globalAlpha=1-p*0.5; xc.fillStyle='#e67e22'; xc.beginPath(); xc.arc(toPos.x,toPos.y,20*(1-0.5*p),0,Math.PI*2); xc.fill();
     xc.restore();
     if(p<1) __animRAF=requestAnimationFrame(frame); else { m.render(); __animRAF=null; }
   }
   __animRAF=requestAnimationFrame(frame);
 }
+
+let __pieceAnim=null;
+function animatePieceMove(fromPos, toPos, duration, onComplete){
+  if(typeof requestAnimationFrame!=='function'){ if(onComplete) onComplete(); return; }
+  const g=ctrl.game, m=current(); if(!m||!m.cellCenter){ if(onComplete) onComplete(); return; }
+  const cv=$(GAME_CANVAS[g]); if(!cv){ if(onComplete) onComplete(); return; }
+  const xc=cv.getContext('2d');
+  if(__pieceAnim){ cancelAnimationFrame(__pieceAnim.af); __pieceAnim=null; }
+  const t0=null;
+  const anim={af:null, from:fromPos, to:toPos, dur:duration||200, cb:onComplete};
+  __pieceAnim=anim;
+  function frame(ts){
+    if(!__pieceAnim||__pieceAnim!==anim){ if(onComplete) onComplete(); return; }
+    if(t0===null)t0=ts;
+    const p=Math.min(1,(ts-t0)/anim.dur);
+    const ease=1-Math.pow(1-p,3);
+    const cx=anim.from.x+(anim.to.x-anim.from.x)*ease;
+    const cy=anim.from.y+(anim.to.y-anim.from.y)*ease;
+    m.render();
+    drawAnimatingPiece(xc, cx, cy, g);
+    if(p<1){ anim.af=requestAnimationFrame(frame); }
+    else{ __pieceAnim=null; m.render(); if(anim.cb) anim.cb(); }
+  }
+  anim.af=requestAnimationFrame(frame);
+}
+function drawAnimatingPiece(ctx, x, y, game){
+  ctx.save();
+  ctx.globalAlpha=0.9;
+  const R=20;
+  // Shadow
+  ctx.beginPath(); ctx.arc(x+1.5,y+2,R,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.2)'; ctx.fill();
+  // Piece body
+  ctx.beginPath(); ctx.arc(x,y,R,0,Math.PI*2);
+  if(game==='jungle'||game==='xiangqi'){
+    ctx.fillStyle='#f7e6df'; ctx.fill();
+    ctx.strokeStyle='#c0392b'; ctx.lineWidth=2.5; ctx.stroke();
+  } else if(game==='chess'){
+    ctx.fillStyle='#fff'; ctx.fill();
+    ctx.strokeStyle='#333'; ctx.lineWidth=2; ctx.stroke();
+  } else if(game==='four'){
+    ctx.fillStyle='#c0392b'; ctx.fill();
+  } else if(game==='ttt'){
+    ctx.fillStyle='#fff'; ctx.fill();
+    ctx.strokeStyle='#c0392b'; ctx.lineWidth=3; ctx.stroke();
+  } else {
+    ctx.fillStyle='#fff'; ctx.fill();
+    ctx.strokeStyle='#c0392b'; ctx.lineWidth=2.5; ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+  ctx.restore();
+}
+
 function sendNet(obj){ if(obj && obj.t==='state') publishState(false); }
 function setNetStatus(t){ const el=$('netStatus'); if(el) el.textContent=t; }
 function setNetConn(state, text){ const c=$('netConn'); if(!c) return; c.className='onl-conn '+(state||''); const t=$('netConnText'); if(t) t.textContent=text; }
@@ -3298,7 +3370,7 @@ $('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); i
   }
   if(ctrl.game==='checkers'){ syncCheckers(); buildCcTeamPickers(); } refresh(); });
 $('diffSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const v=+b.dataset.v; if(v===ctrl.difficulty){ return; } ctrl.difficulty=v; $('diffSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); if(ctrl.mode!=='online'){ $('log').innerHTML=''; $('undoBtn').disabled=true; game.init(); } });
-$('colorSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; let v=mapColor(ctrl.game,b.dataset.v); ctrl.playerColor[ctrl.game]=v; refresh(); });
+$('colorSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; let v=mapColor(ctrl.game,b.dataset.v); ctrl.playerColor[ctrl.game]=v; buildColorSeg(); if(!current().net.get().gameOver){ /* mid-game color change: just re-render */ current().render(); updateStatus(); } else { refresh(); } });
 // ===== 飞行棋专属控制 =====
 $('playersSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; ctrl.aero.players=+b.dataset.v; $('playersSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); syncHumanTeams(); buildTeamPickers(); refresh(); });
 $('aiSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; ctrl.aero.aiCount=+b.dataset.v; const seg=$('aiSeg'); seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); syncHumanTeams(); buildTeamPickers(); refresh(); });
@@ -3349,7 +3421,7 @@ refresh();
 showHome();
 function showHome(){ $('home').style.display='flex'; }
 function hideHome(){ $('home').style.display='none'; }
-$('home').querySelectorAll('.menu-card').forEach(card=>card.addEventListener('click',()=>{ if(ctrl.online.enabled){ netLeave(); ctrl.mode='ai'; } const g=card.dataset.g; ctrl.game=g; ctrl.puzzle=null; tabs.forEach(([i,gg])=>$(i).classList.toggle('active', gg===g)); setHint(hints[g]); hideHome(); refresh(); }));
+$('home').querySelectorAll('.menu-card').forEach(card=>card.addEventListener('click',()=>{ if(ctrl.online.enabled){ netLeave(); } ctrl.mode='ai'; const g=card.dataset.g; ctrl.game=g; ctrl.puzzle=null; tabs.forEach(([i,gg])=>$(i).classList.toggle('active', gg===g)); setHint(hints[g]); hideHome(); refresh(); }));
 $('homeBtn').addEventListener('click',()=>{ ctrl.puzzle=null; showHome(); });
 $('puzzleBtn').addEventListener('click', openPuzzle);
 $('puzzleClose').addEventListener('click', closePuzzle);
