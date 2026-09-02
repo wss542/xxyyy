@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-page-node-id="03xPWSwLNSWjU85U5QckCO">
-<head data-page-node-id="PkEHxj77MxBvdM2m2LRupg">
-<meta charset="UTF-8" data-page-node-id="2fYrGWL94HmlMYkOqpdccD">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover" data-page-node-id="y0IsHewLLovlUU6FaPkSQC">
+<html lang="zh-CN" data-page-node-id="j1m5jXTKTrBStMy4LpBpwD">
+<head data-page-node-id="jRmh5u5g9mcMxWkXDQbGJR">
+<meta charset="UTF-8" data-page-node-id="Mw78kD7ABjSGeKFslJGM7R">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover" data-page-node-id="MsrduzabMryWvzE8Uozca7">
 <title>棋类游戏 · 中国象棋 / 五子棋 / 国际象棋 / 飞行棋 / 跳棋 / 围棋</title>
-    <link rel="manifest" href="manifest.webmanifest" data-page-node-id="0nEN0CmdU0jMOoopitT5aE">
-    <meta name="apple-mobile-web-app-capable" content="yes" data-page-node-id="F508OFZp3hO25ULkgrDxAE">
-    <meta name="mobile-web-app-capable" content="yes" data-page-node-id="zhmlXLufVYfUWuzPSY4vbw">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" data-page-node-id="fXpiiWD4jpBWMajdwNwtwY">
-    <meta name="apple-mobile-web-app-title" content="棋类合集" data-page-node-id="N5nziBFR6jluU3KAHWoLFx">
-    <meta name="theme-color" content="#2b2118" data-page-node-id="U0om9zHRkFM4spAM50xsdu">
+    <link rel="manifest" href="manifest.webmanifest" data-page-node-id="E5weWj4hOOvge440WiR7T6">
+    <meta name="apple-mobile-web-app-capable" content="yes" data-page-node-id="t44r8pkMK0w5zVWTOH8SXp">
+    <meta name="mobile-web-app-capable" content="yes" data-page-node-id="80f3jtz2zVJcdFa1DrWGyL">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" data-page-node-id="trt81uWPx8EvCZsCo6dJ9m">
+    <meta name="apple-mobile-web-app-title" content="棋类合集" data-page-node-id="GYeJi2mvtDHAhz87ctdrPS">
+    <meta name="theme-color" content="#2b2118" data-page-node-id="Bh4WTCwfnGuka0qXBoL5t1">
     <script>
       // 启动时解析分享链接 ?room=CODE，自动填入房间码并标记待加入
       (function(){ try{ var p=new URLSearchParams(location.search); var r=(p.get('room')||'').toUpperCase().trim(); if(r){ window.__autoRoom=r; } }catch(e){} })();
@@ -192,225 +192,259 @@ safe-buffer/index.js:
   body.dark canvas { background:#3a2e1e; }
   body.dark #qrModal > div { background:#241d14; color:#e8dcc4; }
   body.dark #qrImg { background:#fff; }
+
+  /* ===== 残局解谜弹窗 ===== */
+  #puzzleModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:85; align-items:center; justify-content:center; }
+  #puzzleModal.show { display:flex; }
+  .puzzle-card { background:#faf3e6; border-radius:14px; padding:20px 22px; width:min(460px,92vw); max-height:84vh; overflow:auto; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+  .puzzle-card h2 { margin:0 0 4px; font-size:18px; color:#5a3a1a; }
+  .puzzle-card .sub { font-size:12px; color:#998263; margin-bottom:12px; }
+  .puzzle-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid #e3d3b0; border-radius:10px; margin-bottom:8px; cursor:pointer; background:#fffdf7; transition:.15s; }
+  .puzzle-item:hover { border-color:#c0392b; background:#fff4e8; }
+  .puzzle-item .pi-ic { font-size:20px; }
+  .puzzle-item .pi-main { flex:1; }
+  .puzzle-item .pi-title { font-weight:700; color:#5a3a1a; }
+  .puzzle-item .pi-desc { font-size:12px; color:#7a5a32; }
+  .puzzle-item .pi-tag { font-size:11px; color:#fff; background:#c0392b; border-radius:20px; padding:2px 8px; white-space:nowrap; }
+  .puzzle-item.done .pi-tag { background:#2e8b57; }
+  .puzzle-close { margin-top:6px; }
+  body.dark #puzzleModal { background:rgba(0,0,0,.72); }
+  body.dark .puzzle-card { background:#2b2620; box-shadow:0 20px 60px rgba(0,0,0,.6); }
+  body.dark .puzzle-card h2, body.dark .puzzle-item .pi-title { color:#f0c98b; }
+  body.dark .puzzle-item { background:#332d26; border-color:#4a4137; }
+  body.dark .puzzle-item:hover { border-color:#e67e22; background:#3d352c; }
+  body.dark .puzzle-item .pi-desc { color:#b9a786; }
 </style>
 </head>
-<body data-page-node-id="v4xLxvr30WhaKGZ613xhFh">
-  <div id="left" data-page-node-id="yVIra170nSSfePdrK08bR4">
-    <h1 data-page-node-id="KI5IzFN0QDCd0ANe23bwOz">棋 类 游 戏</h1>
-    <div class="tabs" data-page-node-id="dFN7Ntr7Ub1u3d26OCx912">
-      <button class="tab active" id="tabXQ" data-page-node-id="70SDjWNQAK9qCUf7GTnkeL">中国象棋</button>
-      <button class="tab" id="tabGO" data-page-node-id="K0hitgKAhxLHx5XFahOqIG">五子棋</button>
-      <button class="tab" id="tabCH" data-page-node-id="HHcErQgBeDl5j4e72fR5bC">国际象棋</button>
-      <button class="tab" id="tabFL" data-page-node-id="BwbHkNcNHtHjZXEvhWktRw">飞行棋</button>
-      <button class="tab" id="tabCC" data-page-node-id="XRzUqfMJhaypwGLxi2SzP1">跳棋</button>
-      <button class="tab" id="tabWG" data-page-node-id="HxfNUdrFKjafSwD18PYsIA">围棋</button>
-      <button class="tab" id="tabRV" data-page-node-id="08VFqlM6KnGRfA3jE4XVGN">黑白棋</button>
-      <button class="tab" id="tabJG" data-page-node-id="ARNdwrZFFDp4zN5IxuqCNO">斗兽棋</button>
-      <button class="tab" id="tabFO" data-page-node-id="6uBr258D4TRxwDOS8eYT6t">四子棋</button>
-      <button class="tab" id="tabBQ" data-page-node-id="7rN0DvjwHnJUB60KxZoGzQ">暗棋</button>
-      <button class="tab" id="tabTT" data-page-node-id="UPO5EAbNmcAdfiBWi2k29f">井字棋</button>
+<body data-page-node-id="6kqKCbjWvYBh0xxoQnyzYX">
+  <div id="left" data-page-node-id="rCOBTghsvopFNe7E9AIFst">
+    <h1 data-page-node-id="Wnzno2b26pgvZDtnaB4l2W">棋 类 游 戏</h1>
+    <div class="tabs" data-page-node-id="DL5ktEbSLiNiZMGsNZqp2a">
+      <button class="tab active" id="tabXQ" data-page-node-id="fDP3Ldf0KJkS746Iz3WVs5">中国象棋</button>
+      <button class="tab" id="tabGO" data-page-node-id="o5BvunleiDigNzv1cAamb5">五子棋</button>
+      <button class="tab" id="tabCH" data-page-node-id="yr46ad8rdyUVWFnry2umiE">国际象棋</button>
+      <button class="tab" id="tabFL" data-page-node-id="zBK9omHuuEu2T5HngUapG7">飞行棋</button>
+      <button class="tab" id="tabCC" data-page-node-id="CzJ1P0uN6OILjFOUfpyT6h">跳棋</button>
+      <button class="tab" id="tabWG" data-page-node-id="THPyAIrjh0nzmEtSBIvyQb">围棋</button>
+      <button class="tab" id="tabRV" data-page-node-id="lVnAl3MT95BASQpjYOYBeR">黑白棋</button>
+      <button class="tab" id="tabJG" data-page-node-id="S11aBHlrLyNWkIT3s4ZfG1">斗兽棋</button>
+      <button class="tab" id="tabFO" data-page-node-id="3QOaiCogYIg83qGQug9VYr">四子棋</button>
+      <button class="tab" id="tabBQ" data-page-node-id="wHGEgdNRHgnrQNDXXEIQm1">暗棋</button>
+      <button class="tab" id="tabTT" data-page-node-id="sxB2jB1H774OVNmCuUpWs0">井字棋</button>
+      <button class="tab" id="tabBG" data-page-node-id="bgTab001">双陆棋</button>
     </div>
-    <canvas id="boardXQ" data-page-node-id="wdGZzQW1kB13jUHhSkXWRk"></canvas>
-    <canvas id="boardGO" data-page-node-id="RxAuBKwP53t1Isfevh8D2V"></canvas>
-    <canvas id="boardCH" data-page-node-id="IOq1R5qDXxaBCAuCECY6AA"></canvas>
-    <canvas id="boardFL" data-page-node-id="Vk8SH4kT6HyPxXDkhkCOjA"></canvas>
-    <canvas id="boardCC" data-page-node-id="5EDtW843A6BzLsFRYfBugR"></canvas>
-    <canvas id="boardWG" data-page-node-id="Tw5DKGrMgLmbFYCNMPP0hA"></canvas>
-    <canvas id="boardRV" data-page-node-id="tGqluW5ERXyhkydVSTw8Aa"></canvas>
-    <canvas id="boardJG" data-page-node-id="bR1RFFcdI3VdaaMAFOseyA"></canvas>
-    <canvas id="boardFO" data-page-node-id="dHvsHR2RFMbDjAd6p9rPba"></canvas>
-    <canvas id="boardBQ" data-page-node-id="Bav5uGn7Qk8mzprhhApYCs"></canvas>
-    <canvas id="boardTT" data-page-node-id="iKZuYzzGj8twceAblrcC8A"></canvas>
+    <canvas id="boardXQ" data-page-node-id="MtW0ZSOGnuKUbmQxPGlpl9"></canvas>
+    <canvas id="boardGO" data-page-node-id="Rs43Hoh9ZyKOLDFCCfmJbA"></canvas>
+    <canvas id="boardCH" data-page-node-id="DhCvAjv2TNyN6BCG6JibNk"></canvas>
+    <canvas id="boardFL" data-page-node-id="b30c5c5JGEBYhT8RdrEyR1"></canvas>
+    <canvas id="boardCC" data-page-node-id="BAqKvY1KNmbVa0bDOHuEH2"></canvas>
+    <canvas id="boardWG" data-page-node-id="D3FgWze4vS1zPDGEEKWSx9"></canvas>
+    <canvas id="boardRV" data-page-node-id="pgeGWOpnseHsC42Lk5Jh2i"></canvas>
+    <canvas id="boardJG" data-page-node-id="FdwXjjVgdUpq3tdUcjrfE8"></canvas>
+    <canvas id="boardFO" data-page-node-id="qTzkqTyYPF7siUNDTiJgjI"></canvas>
+    <canvas id="boardBQ" data-page-node-id="p5HnAE3yNMl9WmNGrSQzYc"></canvas>
+    <canvas id="boardTT" data-page-node-id="nNGCG347MvE16R80IdsTiR"></canvas>
+    <canvas id="boardBG" data-page-node-id="bgBoard001"></canvas>
   </div>
 
-  <div id="panel" data-page-node-id="IeGSAVT1oDeV6zCkqwWRAG">
-    <div class="row" data-page-node-id="tbYGxoKJgORzoRAYKBgMbs">
-      <label data-page-node-id="uu0iYDmD0etpW4QM4FyQgN">对战模式</label>
-      <div class="seg" id="modeSeg" data-page-node-id="4gpWdRo7gRJBmjCKR3thT4">
-        <button data-v="ai" class="on" data-page-node-id="2tHaZt9eqgUEvGwjF4QC7w">人机对战</button>
-        <button data-v="pvp" data-page-node-id="gFfnfoHPh0ePX96S7lpxjV">双人对战</button>
-        <button data-v="online" data-page-node-id="i3MAZU9HCcDEmjylhdYD3a">联机</button>
+  <div id="panel" data-page-node-id="zMAEnanZUki4MaoJ1vpYR6">
+    <div class="row" data-page-node-id="3ABd0Zzi4Roh5rMs9ZyRfU">
+      <label data-page-node-id="IxeFZ4MLokhRr4ajKhERho">对战模式</label>
+      <div class="seg" id="modeSeg" data-page-node-id="9VkuDlHG5yrjBByzA8sH9v">
+        <button data-v="ai" class="on" data-page-node-id="2Ib6UiukCTL6ONs1BzCVQe">人机对战</button>
+        <button data-v="pvp" data-page-node-id="dQu6osPHaPHUGsBTeYuBhV">双人对战</button>
+        <button data-v="online" data-page-node-id="2CuR8Tpyl10o9D70SUuFPY">联机</button>
       </div>
     </div>
-    <div class="row" data-page-node-id="qoiXGYh5LxrqQSFiFER1t8">
-      <label data-page-node-id="saaXudGhumIKSWzYqZC8Fj">AI 难度（共 4 档）</label>
-      <div class="seg" id="diffSeg" data-page-node-id="QoXkqdwX8N19VDvvOsAi6o">
-        <button data-v="0" data-page-node-id="8agQGOTZ6sdZx2zRlgLx15">入门</button>
-        <button data-v="1" data-page-node-id="giN31QOzFqQqc0Ef1fPchT">简单</button>
-        <button data-v="2" class="on" data-page-node-id="cal3Dmujnu693KZE0Jd5mK">中等</button>
-        <button data-v="3" data-page-node-id="UZoKlcE8sMQQJql0QIv5wX">困难</button>
+    <div class="row" data-page-node-id="jTsbURMK4MDON08pOgRepV">
+      <label data-page-node-id="Ej81oTu8gdaNQvjSlSMxX6">AI 难度（共 4 档）</label>
+      <div class="seg" id="diffSeg" data-page-node-id="Nkm0El0eXjY69E9dLMIHO4">
+        <button data-v="0" data-page-node-id="RoBQEYHAkAZVSgxOd8I0PE">入门</button>
+        <button data-v="1" data-page-node-id="5qeA4wwuxofpTVlyPQ1vJu">简单</button>
+        <button data-v="2" class="on" data-page-node-id="iK6NVMFvLIPftFVfXKaN0Q">中等</button>
+        <button data-v="3" data-page-node-id="hD9mIP0MdvwZAz1IhiFSd5">困难</button>
       </div>
     </div>
-    <div class="row" id="colorRow" data-page-node-id="wd2APG598GDv1AHIrMALtg">
-      <label data-page-node-id="56JzwBDE22b7KcBZ4X31US">你执的棋子</label>
-      <div class="seg" id="colorSeg" data-page-node-id="HXoToHlSKeO1ANxw6G06pc">
-        <button data-v="red" class="on" data-page-node-id="L9CorjQKzxCPFjeGhyFMGS">红 / 黑（象棋/五子）</button>
-        <button data-v="black" data-page-node-id="lmiJOGRBdlf0dJSDZEQAfk">黑 / 白</button>
+    <div class="row" id="colorRow" data-page-node-id="NazCtF52ZSwk2F99TRoDNA">
+      <label data-page-node-id="BvX8bHCeGxgM8UdIxNj7nn">你执的棋子</label>
+      <div class="seg" id="colorSeg" data-page-node-id="paXS5GFRyJ32rQ5lfBstsH">
+        <button data-v="red" class="on" data-page-node-id="AXwPVpwUP6AUgaJJcCwBOs">红 / 黑（象棋/五子）</button>
+        <button data-v="black" data-page-node-id="mIFMjW2FoTPlP3Ln9sRW1S">黑 / 白</button>
       </div>
     </div>
-    <div id="aeroPanel" class="subpanel" style="display:none" data-page-node-id="FXTAZht2lH3mH7xFmovMc3">
-      <div class="row" data-page-node-id="70YLBYIAIHb7aukQJtbyaT">
-        <label data-page-node-id="vN2AJP6VuvyGor3N0hgVGx">玩家人数</label>
-        <div class="seg" id="playersSeg" data-page-node-id="Tx4oqBt2ae19y9nI6Bxwvf">
-          <button data-v="1" class="on" data-page-node-id="sl72JFbsjKOfkKIbnwDx3x">1 人</button>
-          <button data-v="2" data-page-node-id="nC2F0tMNkAsffoJENiti9j">2 人</button>
-          <button data-v="3" data-page-node-id="DUA5mslgDx00X6AsJ3nj1z">3 人</button>
-          <button data-v="4" data-page-node-id="63PyuekBnSYUbaNXRr21KE">4 人</button>
+    <div id="aeroPanel" class="subpanel" style="display:none" data-page-node-id="oCCNaNgFxsCGdop13pCsec">
+      <div class="row" data-page-node-id="t8SlOoIsGG4aQg74Z0097U">
+        <label data-page-node-id="C3lcCPNqiENEUYVFMccePe">玩家人数</label>
+        <div class="seg" id="playersSeg" data-page-node-id="HqjRk9n9Zl0KMMjfF04tLx">
+          <button data-v="1" class="on" data-page-node-id="L8v0oHZjHvJf8zyOalpKUS">1 人</button>
+          <button data-v="2" data-page-node-id="hp4qcPod8m7CLZLmENqiA1">2 人</button>
+          <button data-v="3" data-page-node-id="MtzXtn2MMGIitRxBJTrcHq">3 人</button>
+          <button data-v="4" data-page-node-id="fA7yDaYVVnSfHkVAihV4XS">4 人</button>
         </div>
       </div>
-      <div class="row" data-page-node-id="VZjFJzNnW1Lsh2uzNohZtL">
-        <label data-page-node-id="Qtf77JaVvVvrBYrqeDZHZt">AI 数量</label>
-        <div class="seg" id="aiSeg" data-page-node-id="n9GojP6UhxWVfYs9UBLnYt">
-          <button data-v="0" data-page-node-id="6QuoIZgQNEcWARuJDLvNCg">0</button>
-          <button data-v="1" data-page-node-id="0kwcBUuv4MvUw3ovV4MwaI">1</button>
-          <button data-v="2" data-page-node-id="JUFX7N63ZttaPzgOOH1dKf">2</button>
-          <button data-v="3" class="on" data-page-node-id="5ESQM3qFAwgwcvc1fx7tYi">3</button>
+      <div class="row" data-page-node-id="J1FbTKSQEwM7LCD1mIwuoM">
+        <label data-page-node-id="D8MfgOgUJJSlFXarqQzx7Z">AI 数量</label>
+        <div class="seg" id="aiSeg" data-page-node-id="iXMh08ohskKtJVglwyqMsI">
+          <button data-v="0" data-page-node-id="C3BoHloM3iBRcuTSKL4z31">0</button>
+          <button data-v="1" data-page-node-id="ikyjvXx0uHwDHiG3rZtGw1">1</button>
+          <button data-v="2" data-page-node-id="WngNA0gJJ56frSVFf6iEgh">2</button>
+          <button data-v="3" class="on" data-page-node-id="DYC29G8sdBL5gYaAZH1oyj">3</button>
         </div>
       </div>
-      <div class="row" data-page-node-id="aOiD0Gbf9WBczkVbHeik9c">
-        <label data-page-node-id="RBlGTwci4mTwUQmgAfx2i5">队伍选择（每人独立选色）</label>
-        <div id="teamPickers" data-page-node-id="7xoW39RzYroVmnSAYSbUkV"></div>
+      <div class="row" data-page-node-id="CPpylh1MVCf4M18OO014Vs">
+        <label data-page-node-id="jHOkQ9SvRbohG22jWzKBoU">队伍选择（每人独立选色）</label>
+        <div id="teamPickers" data-page-node-id="ntSVXyJgte3QBFRJQfYvpT"></div>
       </div>
-      <div class="row" data-page-node-id="Zp3rKD2pWdjNiStrBLDvew">
-        <label data-page-node-id="5gwD33MkFudl1J0rt42XsI">规则开关</label>
-        <div class="rule-grid" data-page-node-id="wYq8oB7Qv6Sz5ToTXI51a0">
-          <label class="chk" data-page-node-id="lfJeBQS69PGF0IDhkdC69C"><input type="checkbox" id="ruleJump" checked data-page-node-id="xZawZenPPCpagVhxyExYS6"> 同色跳 +4</label>
-          <label class="chk" data-page-node-id="IGUePDE2XkaObW9JMThtVO"><input type="checkbox" id="ruleFly" checked data-page-node-id="gWtUJGG5B0VSAP2f8WPnRl"> 飞行捷径</label>
+      <div class="row" data-page-node-id="tvw4ZDkagDF3ufLCzJjUZ8">
+        <label data-page-node-id="61rFUhOuoLRTuq0gJ4xCf1">规则开关</label>
+        <div class="rule-grid" data-page-node-id="BPfvNk6FIILDWpBKEbeQ0c">
+          <label class="chk" data-page-node-id="P8SRBRc9AcYHAcxhB0OIw5"><input type="checkbox" id="ruleJump" checked data-page-node-id="JzCjj4UcEtO8o5UpOHpFof"> 同色跳 +4</label>
+          <label class="chk" data-page-node-id="EJ2nXsTnobXJV191UDfQ96"><input type="checkbox" id="ruleFly" checked data-page-node-id="NESgbAHnIr48rnR2GUHE4R"> 飞行捷径</label>
         </div>
       </div>
     </div>
-    <div id="checkersPanel" class="subpanel" style="display:none" data-page-node-id="tRgtJJtCH1WCbv1EA6TCp9">
-      <div class="row" data-page-node-id="2MkhEG8o1jXS812csTO23o">
-        <label data-page-node-id="hukG6TOHXu1t6B5kLkQN3A">玩家人数</label>
-        <div class="seg" id="ccPlayersSeg" data-page-node-id="TIOhBS11mbP0z35nopVhAp">
-          <button data-v="2" class="on" data-page-node-id="3MqAD0A3uKViXqirSoPYcL">2 人</button>
-          <button data-v="3" data-page-node-id="uPJZSTpN6VxDqgodmjbfWx">3 人</button>
-          <button data-v="4" data-page-node-id="pthvqSjAGgPqDxDM9DwQFD">4 人</button>
-          <button data-v="5" data-page-node-id="ie7tdSPG72tbyuy7KxCWFz">5 人</button>
-          <button data-v="6" data-page-node-id="KT0h7NcG5IOlP2bJGLHqeq">6 人</button>
+    <div id="checkersPanel" class="subpanel" style="display:none" data-page-node-id="YWxibDjnJV7YaVqMv8E3ws">
+      <div class="row" data-page-node-id="kLZNDEsooFfh0xrgHzHSNX">
+        <label data-page-node-id="tVvjbCNd1aCSnqKfOQqwod">玩家人数</label>
+        <div class="seg" id="ccPlayersSeg" data-page-node-id="cMs4SMCDbH7CLy5ENycgae">
+          <button data-v="2" class="on" data-page-node-id="zAcawwP4idE1VB6gbEpp99">2 人</button>
+          <button data-v="3" data-page-node-id="78Ar1c0pnJyCUFAfT1NWiX">3 人</button>
+          <button data-v="4" data-page-node-id="eiGcQoK34pxBpJ1N76NhuZ">4 人</button>
+          <button data-v="5" data-page-node-id="LJqWMK0ssy53FnN0fdR19h">5 人</button>
+          <button data-v="6" data-page-node-id="LaTEDPXi2gLJhpnc9Ul8wG">6 人</button>
         </div>
       </div>
-      <div class="row" data-page-node-id="zmI2A2pb2n7SX5f9978ppA">
-        <label data-page-node-id="f1veZ1ECyJ9P4GZqpPlfGw">AI 数量（其余为玩家，至少留 1 人）</label>
-        <div class="seg" id="ccAiSeg" data-page-node-id="do7tjTCUl9MUTLTb6Q4XCO">
-          <button data-v="0" data-page-node-id="FGKqTbB3fwbi0zSH0R7cI6">0</button>
-          <button data-v="1" class="on" data-page-node-id="rq9wFia3FoAxyB5xNegG5B">1</button>
-          <button data-v="2" data-page-node-id="ur3aZlEiB14lhHTOP9run4">2</button>
-          <button data-v="3" data-page-node-id="Tj28jxkaE8Y1yZ9Vk9zffb">3</button>
-          <button data-v="4" data-page-node-id="p7VpR3qHMMWLL5UMcwE8aO">4</button>
-          <button data-v="5" data-page-node-id="PNUsFnLYOSHbnrVVBHv4kv">5</button>
+      <div class="row" data-page-node-id="jNvGavTRoNhzL9CB2UsrPP">
+        <label data-page-node-id="CKuVtYWvgwfuVOaKXqLd4F">AI 数量（其余为玩家，至少留 1 人）</label>
+        <div class="seg" id="ccAiSeg" data-page-node-id="xZ9SNCTVn6CbcFAwontsc7">
+          <button data-v="0" data-page-node-id="fuvVGmZRHIdldhxurAkzZg">0</button>
+          <button data-v="1" class="on" data-page-node-id="hOx9R5dp7vJg4S9HUpZI0d">1</button>
+          <button data-v="2" data-page-node-id="uMsrfsCQC83sKLrNQ0FH5c">2</button>
+          <button data-v="3" data-page-node-id="wcH8PhrIxWir64MKFuiS5H">3</button>
+          <button data-v="4" data-page-node-id="FH8QMs6wR36SFlHLQCZuNe">4</button>
+          <button data-v="5" data-page-node-id="KH8euAVGJvzrrwf1IAnepe">5</button>
         </div>
       </div>
-      <div class="row" data-page-node-id="6UrITipbNIgqQjuMVivuF1">
-        <label data-page-node-id="laeAWDrG991xv4gJwnFHlP">自选颜色（每位玩家选择己方棋子 / 出发角）</label>
-        <div id="ccTeamPickers" data-page-node-id="bE7H17IXKyRSBrtAJlZ9DE"></div>
+      <div class="row" data-page-node-id="p9Vy1KWapyV2F91WZSqoq6">
+        <label data-page-node-id="LYNYdQk7URc8K6bURrQ8f7">自选颜色（每位玩家选择己方棋子 / 出发角）</label>
+        <div id="ccTeamPickers" data-page-node-id="momPyBFCp4x4BBT6igYucL"></div>
       </div>
-      <div class="hint" data-page-node-id="VhVy0RRhlGZJ8mtk7KnAZv">跳棋：把己方 10 颗棋子全部移入对面角即完成。颜色即你的出发角，对面角即目标。AI 难度由左侧「AI 难度」统一设置。</div>
+      <div class="hint" data-page-node-id="zy8JU2MPV6tEDuI9h5CJU9">跳棋：把己方 10 颗棋子全部移入对面角即完成。颜色即你的出发角，对面角即目标。AI 难度由左侧「AI 难度」统一设置。</div>
     </div>
-    <div id="onlinePanel" class="subpanel" style="display:none" data-page-node-id="GDJfi7917naVH1d0jc0WRz">
-      <div class="row" data-page-node-id="PQdTTnNAS5d3I91HZe9zSZ">
-        <label data-page-node-id="cbPMts4iNtIYxsWc4NvRgp">互联网联机（两人对战 · 经公共中继转发）</label>
-        <div class="onl-box" data-page-node-id="PfpBDUtuPDdCshVK1HJFvi">
-          <div class="onl-conn" id="netConn" data-page-node-id="QPnNSw4PU1j5afEwZSOm3C"><span class="dot" data-page-node-id="Acgmqe6rbSChtLhg1h7O2X"></span><span id="netConnText" data-page-node-id="YyEPMHuTrvy3fp1VXC4sEY">未连接</span></div>
-          <div class="onl-warn" id="netWarn" data-page-node-id="ALvfK2ddfS7Y1BlfLMNKzf"></div>
-          <div class="onl-row" data-page-node-id="AzIrVoXOqimWZ8D7f8CRXh"><input id="netBroker" placeholder="信令地址(可选)，留空用默认公共中继 broker.emqx.io" value="" data-page-node-id="vAwAGVORkoEE8H1YtlirRN"></div>
-          <div class="onl-room" id="netRoomBox" data-page-node-id="ANfHO98m7VBLxm39OD40xS">
-            <div data-page-node-id="tUhEHWdsIZpxBpJs2daVcH">房间码（告诉对方输入这个）：</div>
-            <div class="big" id="netRoomCode" data-page-node-id="BZ0ex5fT4vCcLz8symXVmk">------</div>
-            <div class="tip" data-page-node-id="OeWWVQiKEJ7jxpiyFsM6v9">把此码发给对方，对方在「房间码」框输入后点「加入房间」即可开始。双方需选同一棋类，且都能联网。</div>
+    <div id="onlinePanel" class="subpanel" style="display:none" data-page-node-id="HevXYbzz0eKJdKSrEaYeUV">
+      <div class="row" data-page-node-id="W9lN5P28rmvdCZ5JACveZ1">
+        <label data-page-node-id="hIJmQfL2gfEH65APluhogA">互联网联机（两人对战 · 经公共中继转发）</label>
+        <div class="onl-box" data-page-node-id="iJmX8jXoNUEgGWqQT8LFit">
+          <div class="onl-conn" id="netConn" data-page-node-id="D56frMm59W5jLLFPM3PBrR"><span class="dot" data-page-node-id="Xrhxw3AGs8skBMNuUfF1md"></span><span id="netConnText" data-page-node-id="7u3J0AqCKzGoKVgUzUc2h6">未连接</span></div>
+          <div class="onl-warn" id="netWarn" data-page-node-id="LgbEXybWwHqapk4dGEdCHJ"></div>
+          <div class="onl-row" data-page-node-id="bADHwLuqcafW5V2oQXdlhQ"><input id="netBroker" placeholder="信令地址(可选)，留空用默认公共中继 broker.emqx.io" value="" data-page-node-id="3Ghjz4AXxfRixoqLLlWD81"></div>
+          <div class="onl-room" id="netRoomBox" data-page-node-id="p2zDmXnvKf0diemcmCmooO">
+            <div data-page-node-id="e3HuM3PJIibrKIMSXPKhEo">房间码（告诉对方输入这个）：</div>
+            <div class="big" id="netRoomCode" data-page-node-id="6OwdjP64W9elrBdYuonkB0">------</div>
+            <div class="tip" data-page-node-id="mELKVtadEWi7dl9B0RQWCV">把此码发给对方，对方在「房间码」框输入后点「加入房间」即可开始。双方需选同一棋类，且都能联网。</div>
           </div>
-          <div class="onl-row" data-page-node-id="AhB4FPkqLT2sAqsQGWkvEz">
-            <button class="btn btn-primary" id="netCreate" style="margin:0;flex:1" data-page-node-id="191LQ3cZUvKKwcwFVSU2WH">创建房间</button>
-            <button class="btn btn-ghost" id="netJoin" style="margin:0;flex:1" data-page-node-id="RYgV85YE6pS9yUMlCY6K7Z">加入房间</button>
+          <div class="onl-row" data-page-node-id="EJELJw7kkyvHy8Z4mIaJD2">
+            <button class="btn btn-primary" id="netCreate" style="margin:0;flex:1" data-page-node-id="aft6Vzsduarj7KBqo2ytC7">创建房间</button>
+            <button class="btn btn-ghost" id="netJoin" style="margin:0;flex:1" data-page-node-id="uah4nwkJiv1cupjdTxMSGw">加入房间</button>
           </div>
-          <div class="onl-row" data-page-node-id="n2kHowWBR6riTa5NcEjxSc">
-            <input id="netCode" placeholder="输入房间码加入" maxlength="6" style="text-transform:uppercase" data-page-node-id="6bnqYCmghS1xNMvuq1L7aC">
-            <button class="btn btn-ghost" id="netCopy" style="margin:0;flex:0 0 auto;padding:8px 14px" data-page-node-id="5TxaPKGK8hyfpl9pgzmE0W">复制</button>
+          <div class="onl-row" data-page-node-id="tzza35kChz4RPKOkLUakTe">
+            <input id="netCode" placeholder="输入房间码加入" maxlength="6" style="text-transform:uppercase" data-page-node-id="awjypSNbDFiJivXYqbVcIT">
+            <button class="btn btn-ghost" id="netCopy" style="margin:0;flex:0 0 auto;padding:8px 14px" data-page-node-id="Ue6ElugdAC2X77AiSohlIM">复制</button>
           </div>
-          <div class="onl-row" data-page-node-id="cWMmQGdaO86Uf1EJAlhTkE"><label class="chk" data-page-node-id="Q5PDD7Dnuh1HlUwn6i0jCN"><input type="checkbox" id="netSpectate" data-page-node-id="vMYBpycWKw4f8Xqu5LMEMX"> 观战模式（只看不下，需双方选同一棋类）</label></div>
-          <div class="onl-status" id="netStatus" data-page-node-id="uDCuyPO9999qOfHV31XMg0">进入联机后，一方点「创建房间」拿到房间码，另一方输入房间码点「加入房间」。双方需选同一棋类。</div>
-          <div class="onl-score" id="scoreBox" data-page-node-id="l4Mu9cGsuuDjR8L28W8Du3">本棋 0胜 / 0负 / 0平</div>
-          <div class="onl-row" data-page-node-id="0KxXIQ5C7c3ICbyObocYHj"><button class="btn btn-ghost" id="netLeave" style="margin:0;flex:1" data-page-node-id="24S3vmIEkNeeAvFivcVCuw">断开连接</button></div>
-          <div class="onl-row" data-page-node-id="Z9UiVpO8AftxcJqXH97xK6">
-            <button class="btn btn-ghost" id="netLobby" style="margin:0;flex:1" data-page-node-id="ZWFH4NY39cUCxEN0SQPD1j">浏览在线房间</button>
-            <button class="btn btn-ghost" id="netShare" style="margin:0;flex:1" data-page-node-id="rItAnW1jHAVbHwqHdlspIK">分享房间码</button>
+          <div class="onl-row" data-page-node-id="00WdAQUHzxEsjSDxUdVqDO"><label class="chk" data-page-node-id="IfEytH39QFrTMTJhKBRyVK"><input type="checkbox" id="netSpectate" data-page-node-id="78s9jRobEcRHlbzkxh1B38"> 观战模式（只看不下，需双方选同一棋类）</label></div>
+          <div class="onl-status" id="netStatus" data-page-node-id="BY9ONxhcDWcBz7iZcVP5NE">进入联机后，一方点「创建房间」拿到房间码，另一方输入房间码点「加入房间」。双方需选同一棋类。</div>
+          <div class="onl-score" id="scoreBox" data-page-node-id="K0xJnMJ4eglgBu40qKZnJR">本棋 0胜 / 0负 / 0平</div>
+          <div class="onl-row" data-page-node-id="dq6L6SVDzdZ1mKSnYDzcve"><button class="btn btn-ghost" id="netLeave" style="margin:0;flex:1" data-page-node-id="lfwCR78q0eJCsPYE4SeBGX">断开连接</button></div>
+          <div class="onl-row" data-page-node-id="3yXsH1oV2Rt2NjRdTToCDm">
+            <button class="btn btn-ghost" id="netLobby" style="margin:0;flex:1" data-page-node-id="3go8PRIyFKFJhBFnS3t79m">浏览在线房间</button>
+            <button class="btn btn-ghost" id="netShare" style="margin:0;flex:1" data-page-node-id="rebWBzXEiuKgtbH1g0pvtn">分享房间码</button>
           </div>
-          <div class="onl-chat" id="netChat" style="display:none" data-page-node-id="JEvcrayKKSD9xa6CCphd56">
-            <div class="chat-title" data-page-node-id="1NGIeRf6jxBcwGO9SSbdGF">对局聊天</div>
-            <div class="chat-msgs" id="chatMsgs" data-page-node-id="6Rs49CVlyxkYWaOIuoSFFp"></div>
-            <div class="chat-emojis" data-page-node-id="KDDmK03akD9uFqXrciBvWa">
-              <button type="button" data-em="👍" data-page-node-id="1MynYpsgzIPG2H6eUEIpbq">👍</button><button type="button" data-em="😄" data-page-node-id="bCl1eQsHAPZtNIotV2wcFi">😄</button><button type="button" data-em="😮" data-page-node-id="tskf1VOSOfEEAE2CIyvZ4S">😮</button><button type="button" data-em="😡" data-page-node-id="5SUfmsfVsbq6IslBB1IrDm">😡</button><button type="button" data-em="🎉" data-page-node-id="n2HJeXm30FbLq6ej14MnSE">🎉</button><button type="button" data-em="🤔" data-page-node-id="b6mPctBpLHt5aC1btInu8N">🤔</button>
+          <div class="onl-chat" id="netChat" style="display:none" data-page-node-id="t6aCzSGKp9ygVjjLL42MxU">
+            <div class="chat-title" data-page-node-id="sOSsF1AgKyWkKeSs9IQ9P1">对局聊天</div>
+            <div class="chat-msgs" id="chatMsgs" data-page-node-id="4TKgKHwxR5kB6gy2rSoOSx"></div>
+            <div class="chat-emojis" data-page-node-id="qqjbXX5Q4gZS5c6Cw1Jh5W">
+              <button type="button" data-em="👍" data-page-node-id="LBe3HEHGUUgz1q74RhAUlP">👍</button><button type="button" data-em="😄" data-page-node-id="yS5Yy4HU5wNZcGwp7jsXoN">😄</button><button type="button" data-em="😮" data-page-node-id="AN63kQV6uVsCmcQHwTV2Bd">😮</button><button type="button" data-em="😡" data-page-node-id="hBuaIHbjW63qXPhp3nrd7q">😡</button><button type="button" data-em="🎉" data-page-node-id="Wdv5zXJ53aMo8me3RchIFD">🎉</button><button type="button" data-em="🤔" data-page-node-id="mfsvLSKMJHYZ23UtIBWBs6">🤔</button>
             </div>
-            <div class="chat-input-row" data-page-node-id="943q5qVF9PZf5UNjG59MWK">
-              <input id="chatInput" placeholder="发消息…" maxlength="120" data-page-node-id="NXiRBauHbJGRFpKZnh1Pjc">
-              <button class="btn btn-primary" id="chatSend" type="button" style="margin:0;flex:0 0 auto;padding:6px 12px" data-page-node-id="90DTbWZD8GfjrsvuSWC5rB">发送</button>
+            <div class="chat-input-row" data-page-node-id="FKcBsAgiYA19cAaBSId3eE">
+              <input id="chatInput" placeholder="发消息…" maxlength="120" data-page-node-id="gMrFuR1hDop13PvUWJdPk0">
+              <button class="btn btn-primary" id="chatSend" type="button" style="margin:0;flex:0 0 auto;padding:6px 12px" data-page-node-id="hfrgaQ17EU0a50vgV7yzFn">发送</button>
             </div>
           </div>
-          <div class="onl-undo" id="undoReqBar" style="display:none" data-page-node-id="ckExptv9qQY80WBAt1lQYt">
-            <span id="undoReqText" data-page-node-id="EjtqYm1OEujpCLe23zGPS0">对方请求悔棋</span>
-            <button class="btn btn-primary" id="undoAccept" type="button" style="margin:0;flex:0 0 auto;padding:4px 10px" data-page-node-id="Sx0TjWrYGYu8BJyDt14Gcd">同意</button>
-            <button class="btn btn-ghost" id="undoDeny" type="button" style="margin:0;flex:0 0 auto;padding:4px 10px" data-page-node-id="v93GKQJIoV7bHXyYsULh02">拒绝</button>
+          <div class="onl-undo" id="undoReqBar" style="display:none" data-page-node-id="ZqJ4WsHBS9wjZQy8dlYImu">
+            <span id="undoReqText" data-page-node-id="1VDBIqCOs0RobsVtTxlFfz">对方请求悔棋</span>
+            <button class="btn btn-primary" id="undoAccept" type="button" style="margin:0;flex:0 0 auto;padding:4px 10px" data-page-node-id="syaxdsFhg2EuwoDMy7UYuA">同意</button>
+            <button class="btn btn-ghost" id="undoDeny" type="button" style="margin:0;flex:0 0 auto;padding:4px 10px" data-page-node-id="H13gAtD8JIsMkdHs1fKSnx">拒绝</button>
           </div>
-          <div class="onl-movelog" id="netMoveLog" style="display:none" data-page-node-id="18YNmag2xdw38asuFh0tDq">
-            <div class="chat-title" data-page-node-id="M5174snVkvAWk18n5NUroE">棋谱</div>
-            <div id="moveLogList" data-page-node-id="LM35gJTi7quSmkzqGDrBtd"></div>
+          <div class="onl-movelog" id="netMoveLog" style="display:none" data-page-node-id="Sqcyqn5rVneNBXnnq0WDmE">
+            <div class="chat-title" data-page-node-id="DvrsAk5ivGuJQKWICuuxg4">棋谱</div>
+            <div id="moveLogList" data-page-node-id="FTZTl3dIRDVHCIukOv8puV"></div>
           </div>
-          <div class="onl-lobby" id="lobbyPanel" style="display:none" data-page-node-id="teCOXAfFLzBcCHIEZN7oEN">
-            <div class="chat-title" data-page-node-id="IUBIUoVICVK2Aw4YfXgJ1A">在线房间大厅 <button class="btn btn-ghost" id="lobbyClose" type="button" style="margin:0;flex:0 0 auto;padding:2px 8px" data-page-node-id="l2dVdzdtsMXyrG3Ks8RzTH">收起</button></div>
-            <div class="lobby-list" id="lobbyList" data-page-node-id="ekoxJHq7pUJcMocDSszzur"></div>
+          <div class="onl-lobby" id="lobbyPanel" style="display:none" data-page-node-id="dvohkGGhgFnVeQHFvjcdmn">
+            <div class="chat-title" data-page-node-id="FQFb4lhO9hEPVqUoOTKnHd">在线房间大厅 <button class="btn btn-ghost" id="lobbyClose" type="button" style="margin:0;flex:0 0 auto;padding:2px 8px" data-page-node-id="VWFBQC07mVGOq4iZlBS9DD">收起</button></div>
+            <div class="lobby-list" id="lobbyList" data-page-node-id="4pdlN7PYtktJ9aQcdtT1JX"></div>
           </div>
         </div>
       </div>
     </div>
-    <div class="turn-box" data-page-node-id="5akY0AFI9Ozc6rT0AQZh8G"><span id="turnDot" class="dot red" data-page-node-id="x8faCSVFI7Q813Y4fInlH9"></span><span id="turnText" data-page-node-id="9D6Vdm3j9f1RtR7E8qd1Gs">红方走棋</span><span id="moveTimer" class="move-timer" data-page-node-id="GDxybHwKyirfbuw4t6SOCF"></span></div>
-    <div id="status" class="status" data-page-node-id="bapCTxL2yFPkE2h47S7crB">点击棋子开始对局</div>
-    <button class="btn btn-ghost" id="undoBtn" data-page-node-id="LT8pvWbthPxoEL097EybIM">悔棋</button>
-    <button class="btn btn-primary" id="restartBtn" data-page-node-id="plNGafSJreA2OuBYH6PgVl">重新开始</button>
-    <button class="btn btn-ghost" id="passBtn" style="display:none" data-page-node-id="TAj2wfhHLXW93FeHhPReOQ">虚手 (Pass)</button>
-    <button class="btn btn-ghost" id="flipBtn" data-page-node-id="6dHcOdGdM5gCl9mkFNEZBa">⇅ 翻转棋盘</button>
-    <button class="btn btn-ghost" id="themeBtn" data-page-node-id="67TOfGAzHWer67OEbGWjSO">🌙 暗色模式</button>
-    <button class="btn btn-ghost" id="replayBtn" data-page-node-id="qgWkRYzGHQFw5VNWbQFh87">⏯ 复盘回放</button>
-    <button class="btn btn-ghost" id="homeBtn" data-page-node-id="W3eMLopN7BGJe5S9pGdlQo">≡ 返回主菜单</button>
-    <div class="log-title" data-page-node-id="yQhfozFpqMfGroN62nXwvv">对局记录</div>
-    <div id="log" data-page-node-id="lPXzs3WeegMcOpTgAFBeBD"></div>
-    <div class="hint" id="hint" data-page-node-id="euZa33ZSgoCJJBFFa4HQ1G"></div>
-    <div id="replayBar" style="display:none; margin-top:10px; border-top:1px dashed #d8c39a; padding-top:10px;" data-page-node-id="byMU46JNS0bMFZQQeFR15U">
-      <div style="font-size:13px; color:#7a5a32; margin-bottom:6px;" data-page-node-id="GNdUP8uytw1PCG4wK6I3ol">复盘模式：浏览本局每一步（不影响当前棋局）</div>
-      <div class="seg" id="replaySeg" data-page-node-id="0leOC6qpl5CIKluLFA5nuk">
-        <button id="rpPrev" style="flex:1" data-page-node-id="G3MFVrUFbG2nxyTa3wjypJ">◀ 上一步</button>
-        <button id="rpNext" style="flex:1" data-page-node-id="6GxZoWbW2Gbrna8gl9ZmHk">下一步 ▶</button>
-        <button id="rpExit" style="flex:1" data-page-node-id="ZKOAQ0lQZ7zsVse1Lb6cLu">退出复盘</button>
+    <div class="turn-box" data-page-node-id="slMtvUJn53EZheu9q6YXy0"><span id="turnDot" class="dot red" data-page-node-id="V9f3P7vGXFYE7h4EMGDENd"></span><span id="turnText" data-page-node-id="GCiOIhrHZDZdvKZG7jDC4a">红方走棋</span><span id="moveTimer" class="move-timer" data-page-node-id="aI8whvi1wcUCI5dm6yyfLS"></span></div>
+    <div id="status" class="status" data-page-node-id="4ZXguKzeWj0QXiepiHZLXR">点击棋子开始对局</div>
+    <button class="btn btn-ghost" id="undoBtn" data-page-node-id="Ddj1VnvGRMaz2p1uUAsxLQ">悔棋</button>
+    <button class="btn btn-primary" id="restartBtn" data-page-node-id="Jv6jrUD2uh4HdKVUC0Du3d">重新开始</button>
+    <button class="btn btn-ghost" id="passBtn" style="display:none" data-page-node-id="JYahPE24Jvk5cShgrDNOBR">虚手 (Pass)</button>
+    <button class="btn btn-ghost" id="flipBtn" data-page-node-id="KwALWYPtn3zL2nfAL5rlFC">⇅ 翻转棋盘</button>
+    <button class="btn btn-ghost" id="themeBtn" data-page-node-id="EkmGIJZKgZxJssklQCLQTc">🌙 暗色模式</button>
+    <button class="btn btn-ghost" id="replayBtn" data-page-node-id="BP4BOWuOi5DzdFSdmocWC3">⏯ 复盘回放</button>
+    <button class="btn btn-ghost" id="puzzleBtn" data-page-node-id="puzzleBtn001">🧩 残局解谜</button>
+    <button class="btn btn-ghost" id="homeBtn" data-page-node-id="kB8XxyhwV7C7NW2a15xjKD">≡ 返回主菜单</button>
+    <div class="log-title" data-page-node-id="LQFYwKiXKmrLKqTgEtaZK5">对局记录</div>
+    <div id="log" data-page-node-id="XOB66QmuyTfDoMbF0o5OKh"></div>
+    <div class="hint" id="hint" data-page-node-id="n5tI9y1Mr0CoOV4xIMk3TN"></div>
+    <div id="replayBar" style="display:none; margin-top:10px; border-top:1px dashed #d8c39a; padding-top:10px;" data-page-node-id="GvGh4b5nZcyZ2rExlw0rjV">
+      <div style="font-size:13px; color:#7a5a32; margin-bottom:6px;" data-page-node-id="O6QtMFXwiAD0EBIk7ayVjE">复盘模式：浏览本局每一步（不影响当前棋局）</div>
+      <div class="seg" id="replaySeg" data-page-node-id="sK1ItH68XwomZASgNpZ5uW">
+        <button id="rpPrev" style="flex:1" data-page-node-id="Oa8j0mysI0CkkGKPJ8uDB6">◀ 上一步</button>
+        <button id="rpNext" style="flex:1" data-page-node-id="17JJdtzrDg3TaacvSuzLE0">下一步 ▶</button>
+        <button id="rpExit" style="flex:1" data-page-node-id="LnofFE76z8CHvQPtXK3XdK">退出复盘</button>
       </div>
-      <div style="font-size:13px; color:#7a5a32; margin-top:6px;" data-page-node-id="flXqDsNIjfhaAJbhjjgAnY">第 <span id="rpIdx" data-page-node-id="bxW5ONUexxeUd7aqEnAyeU">0</span> / <span id="rpTotal" data-page-node-id="uNO5jlSniEQNlQZhH4cTCw">0</span> 步</div>
+      <div style="font-size:13px; color:#7a5a32; margin-top:6px;" data-page-node-id="Z71UqPypakYNZf9aZSiURo">第 <span id="rpIdx" data-page-node-id="Qqcz0Jx97VFiTkwYYdcShp">0</span> / <span id="rpTotal" data-page-node-id="C6G7Q7pgLVk6rRfJLF7B6o">0</span> 步</div>
     </div>
   </div>
 
-  <div id="qrModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:80; align-items:center; justify-content:center;" data-page-node-id="YsZxCJLcAYYx7bKxICGjGC">
-    <div style="background:#faf3e6; border-radius:14px; padding:22px 24px; width:280px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.5);" data-page-node-id="mGRlyFFROJRWv6yC8RWcvG">
-      <div style="font-size:18px; font-weight:800; color:#5a3a1a; margin-bottom:12px;" data-page-node-id="MYUGWgZHpsvJ4of7zeXRGM">扫码加入房间</div>
-      <img id="qrImg" style="width:200px; height:200px; background:#fff; border-radius:8px; border:1px solid #e3d3b0;" data-page-node-id="UIc17Y32tpZIl5TD6xPVvG">
-      <div style="font-size:13px; color:#7a5a32; margin-top:10px;" data-page-node-id="jcImhHyF5kpWJcBTA8PrDC">房间码 <b id="qrCode" style="letter-spacing:2px; color:#c0392b;" data-page-node-id="3yAnysP7KkCdNsLBy0RyGM"></b></div>
-      <div style="font-size:12px; color:#998263; margin-top:4px;" data-page-node-id="8xYWC5UEvzBADVfhEzIeiM">朋友用手机扫此码，自动进入同一房间</div>
-      <button class="btn btn-primary" id="qrClose" style="margin-top:14px;" data-page-node-id="V6nyqCoXe9HCltpOekeGNA">关闭</button>
+  <div id="qrModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:80; align-items:center; justify-content:center;" data-page-node-id="x7OEyX1r0yJnKOrwBzacyA">
+    <div style="background:#faf3e6; border-radius:14px; padding:22px 24px; width:280px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.5);" data-page-node-id="6EFnyLuR0HEOIXtRqMz3cM">
+      <div style="font-size:18px; font-weight:800; color:#5a3a1a; margin-bottom:12px;" data-page-node-id="ZuwxQB7jpCROISWthH26LP">扫码加入房间</div>
+      <img id="qrImg" style="width:200px; height:200px; background:#fff; border-radius:8px; border:1px solid #e3d3b0;" data-page-node-id="3HEqCgsqM3D7q6FdJEIoLs">
+      <div style="font-size:13px; color:#7a5a32; margin-top:10px;" data-page-node-id="5YKxlAHWPI7hRxVFYFzf8f">房间码 <b id="qrCode" style="letter-spacing:2px; color:#c0392b;" data-page-node-id="IYoxaUiYK1PQ1mPslwlfGc"></b></div>
+      <div style="font-size:12px; color:#998263; margin-top:4px;" data-page-node-id="yor8U8wu7dO52lBRKHJAdY">朋友用手机扫此码，自动进入同一房间</div>
+      <button class="btn btn-primary" id="qrClose" style="margin-top:14px;" data-page-node-id="Gx54kvroLCAOKOMetl3VpV">关闭</button>
     </div>
   </div>
-  <div id="toast" style="display:none; position:fixed; left:50%; top:18px; transform:translateX(-50%); background:rgba(44,36,27,.92); color:#f0c98b; padding:8px 16px; border-radius:20px; font-size:13px; z-index:90;" data-page-node-id="LvgMJGJzuiBBqB4YnaG2Sb"></div>
+  <div id="puzzleModal" data-page-node-id="puzzleModal001">
+    <div class="puzzle-card">
+      <h2>🧩 残局解谜</h2>
+      <div class="sub">找出制胜的一手，点开即挑战（进度自动保存）</div>
+      <div id="puzzleList"></div>
+      <button class="btn btn-primary puzzle-close" id="puzzleClose" data-page-node-id="puzzleClose001">关闭</button>
+    </div>
+  </div>
+  <div id="toast" style="display:none; position:fixed; left:50%; top:18px; transform:translateX(-50%); background:rgba(44,36,27,.92); color:#f0c98b; padding:8px 16px; border-radius:20px; font-size:13px; z-index:90;" data-page-node-id="6VRehoRFMa5oFZoYDHeG9c"></div>
 
-  <div id="home" data-page-node-id="ezBVrPGAoIKO2rcGRx1O7b">
-    <h1 data-page-node-id="1qDyqZ31o9W0kHC0Hzoyso">棋 类 游 戏</h1>
-    <div class="sub" data-page-node-id="Rg7Y6GHPu5AE6kHHZgnahs">选择一种棋类开始对局</div>
-    <div class="menu-grid" data-page-node-id="dz6szPk6HSyELCdnZFeM9f">
-      <div class="menu-card" data-g="xiangqi" data-page-node-id="OVjxplwUIMVdPqVWjBOLnU"><div class="ic" data-page-node-id="kjX6NSemBZxyR3FX1BBLLq">♚</div><div class="nm" data-page-node-id="9Fc646ijxfkuwGxbglGVgM">中国象棋</div><div class="ds" data-page-node-id="0r48oeeHF1yKEh4MrKhc8s">红黑对弈，车马炮将士象，将军将死即胜。支持 4 档 AI 与双人对战。</div><div class="go" data-page-node-id="P3AnacWXIdIwbHkB5bJcX8">开始 ▶</div></div>
-      <div class="menu-card" data-g="gomoku" data-page-node-id="lYQwrLEB5AAMuMcbMDye1C"><div class="ic" data-page-node-id="uHLbDawLkoGPDP0I1emFHF">⚫</div><div class="nm" data-page-node-id="2VHboN3vfOystoS27YOYrU">五子棋</div><div class="ds" data-page-node-id="VaOqMYAZ3Ja73DOnwD8vsu">黑先白后，先连成五子者胜（含禁手）。人机 / 双人，4 档 AI。</div><div class="go" data-page-node-id="xLhPXdMt9wjqWvp1eHOP71">开始 ▶</div></div>
-      <div class="menu-card" data-g="chess" data-page-node-id="sDmDonE0NGmZP1o8vPEfQQ"><div class="ic" data-page-node-id="EqeVGRGdYZfVDnrEjdfPMp">♛</div><div class="nm" data-page-node-id="A5cWRGWw9QIHp9rze4oo59">国际象棋</div><div class="ds" data-page-node-id="hRHvfqUjAJwpqsOUUDjMu5">王车易位、吃过路兵、升变，将死即胜。4 档 AI、双人。</div><div class="go" data-page-node-id="4rB1FAB7VgVANwC91eO6Kf">开始 ▶</div></div>
-      <div class="menu-card" data-g="aero" data-page-node-id="WL31nM3UAXBhlHiiB8QeSm"><div class="ic" data-page-node-id="THfOxvC6mbXwa6MvXNOEhI">🎲</div><div class="nm" data-page-node-id="HW3Ew7ORA9mCK8jKT7CPlI">飞行棋</div><div class="ds" data-page-node-id="yVa6vTllVgXaydO1tAS6By">1~4 人，自选红/黄/蓝/绿队伍，掷骰绕场抵达中心。可开关规则。</div><div class="go" data-page-node-id="VYlvk3ouUQ8r4h7nj0Piq5">开始 ▶</div></div>
-      <div class="menu-card" data-g="checkers" data-page-node-id="G58vRe90fZrf9fkSAD6QbR"><div class="ic" data-page-node-id="4eTxGkKeSwE6olwOF9OUeO">🔷</div><div class="nm" data-page-node-id="OepEY9MHMvtfisY4enCXDA">跳棋（中国跳棋）</div><div class="ds" data-page-node-id="aexROOGlMp9yMD2aDftqQu">2~6 人，自选颜色与 AI 数量，连跳移动，把棋子移入对面角。4 档 AI。</div><div class="go" data-page-node-id="8grK2d86VKDVJ9lEA9kXPC">开始 ▶</div></div>
-      <div class="menu-card" data-g="weiqi" data-page-node-id="A6AdpHR5DCljulc0BvsfQg"><div class="ic" data-page-node-id="EckXhTikxfVoiWUKBN4Wb8">⚪</div><div class="nm" data-page-node-id="6OuRV0f9EB3qbb5z7m6muV">围棋</div><div class="ds" data-page-node-id="avj5FMsKwyyFimJ7jm6nBt">9×9 棋盘，提子 / 打劫 / 围空，数子判定胜负（白贴 6.5 目）。人机 / 双人。</div><div class="go" data-page-node-id="HBsagoMrEoeH4VkoF0MBMu">开始 ▶</div></div>
-      <div class="menu-card" data-g="reversi" data-page-node-id="zmExV5SOdYk29F2xZkTHZ1"><div class="ic" data-page-node-id="BRAZNkRqPlq5L5VF9hIzax">⬛</div><div class="nm" data-page-node-id="BjpasMB6mekEUr7ZYi9Amm">黑白棋</div><div class="ds" data-page-node-id="uhF2K5h6IYEH2ELXJq1ujH">8×8 棋盘，落子夹击翻转对方一片棋子，终局子多者胜。规则 1 分钟学会，AI 犀利。</div><div class="go" data-page-node-id="fSAsiYC5Vtfo4mCB9yBsvX">开始 ▶</div></div>
-      <div class="menu-card" data-g="jungle" data-page-node-id="FYcy33aDbgxoE6G1v6DwRJ"><div class="ic" data-page-node-id="a0e8g6UnybZqlW6FHRxlfx">🐯</div><div class="nm" data-page-node-id="LukMztJJ1cBaCE7OkE2bDn">斗兽棋</div><div class="ds" data-page-node-id="pGcFLIGLEU8wZLVNmNw8HG">鼠象互克、陷阱、兽穴、小河。8 种动物按等级吃子，走进对方兽穴即胜。4 档 AI。</div><div class="go" data-page-node-id="5P2RDiDX4lkgKApBVO51Py">开始 ▶</div></div>
-      <div class="menu-card" data-g="four" data-page-node-id="GCkwY4dEJuF2OiC2RI4DAo"><div class="ic" data-page-node-id="yj5JQH5cAVyDWPRNXKAXQ3">🔴</div><div class="nm" data-page-node-id="CKjMWFNilHyWMP6sQm3fSA">四子棋</div><div class="ds" data-page-node-id="LnCobU1IHw4OrxnQvuuaxX">7 列 × 6 行，落子靠重力下沉，率先连成四子（横/竖/斜）者胜。节奏快、联机超爽。</div><div class="go" data-page-node-id="PbKnWlsyRPOUwKpB3yu8Zf">开始 ▶</div></div>
-      <div class="menu-card" data-g="banqi" data-page-node-id="qH0QUbenNrcSgAQvA91Q1E"><div class="ic" data-page-node-id="DgUXueiVswkC5SXDfYeoWD">🂠</div><div class="nm" data-page-node-id="Cj5tjDPaApET74BqiDTcVd">暗棋（翻棋）</div><div class="ds" data-page-node-id="WeQN7X0fr2aAPYuVNzSRjU">棋子背面朝上，翻到才知敌我。按将/士/象/車/馬/包/兵等级吃子，吃掉对方「将」即胜。运气 + 策略。</div><div class="go" data-page-node-id="OWEeRYPIClzf3AouGMdOow">开始 ▶</div></div>
-      <div class="menu-card" data-g="ttt" data-page-node-id="YBixq1A17pYwNug3cpMwYY"><div class="ic" data-page-node-id="154BAr4occm4RwwzBk6pTr">✖️</div><div class="nm" data-page-node-id="1LhRzEVzuhJ7a3jm3UU48C">井字棋</div><div class="ds" data-page-node-id="am835rWEXwDOjZUgoDwcHh">3×3 经典对战，率先连成一线者胜。规则极简，适合和朋友随手来一局。</div><div class="go" data-page-node-id="R7uHAfG5GzFyy74XrHWz3l">开始 ▶</div></div>
+  <div id="home" data-page-node-id="lbqt1sxCxmR7gNPYI4h2rb">
+    <h1 data-page-node-id="rG7J31CqouSu4ofkvbjJvE">棋 类 游 戏</h1>
+    <div class="sub" data-page-node-id="2iqRE98cueuFwkBt6tZzd3">选择一种棋类开始对局</div>
+    <div class="menu-grid" data-page-node-id="4Txfs4y3onVJ1vE0D5jALh">
+      <div class="menu-card" data-g="xiangqi" data-page-node-id="Qys81swB7FulLjO2k2fgAE"><div class="ic" data-page-node-id="1SJfp1IHhuF3homnWH5hIs">♚</div><div class="nm" data-page-node-id="aIni1GaXfZXtOaG61LlqGa">中国象棋</div><div class="ds" data-page-node-id="CXYkftWGwUqINn0FY66IBF">红黑对弈，车马炮将士象，将军将死即胜。支持 4 档 AI 与双人对战。</div><div class="go" data-page-node-id="y1IeKJTU3CLmoJEbGl4L2R">开始 ▶</div></div>
+      <div class="menu-card" data-g="gomoku" data-page-node-id="mvQ7GGzfyZrQHJCrfyJHxc"><div class="ic" data-page-node-id="UblSKPpQih66Ifvk1shJ69">⚫</div><div class="nm" data-page-node-id="qlavZehAOYEOV3YGQPrElb">五子棋</div><div class="ds" data-page-node-id="QeXlNLkJoNa3T4EwOT2Sit">黑先白后，先连成五子者胜（含禁手）。人机 / 双人，4 档 AI。</div><div class="go" data-page-node-id="0VCXIV34Uw1waOhwaOwMEB">开始 ▶</div></div>
+      <div class="menu-card" data-g="chess" data-page-node-id="rorLo4f3rDCAWDfucquIOt"><div class="ic" data-page-node-id="ZD2HGrdjvQ4wi1H7KJJXSl">♛</div><div class="nm" data-page-node-id="iscCozahCaCu6RJ82Wi6qS">国际象棋</div><div class="ds" data-page-node-id="PmHfEPLf4LCMssg5inINwj">王车易位、吃过路兵、升变，将死即胜。4 档 AI、双人。</div><div class="go" data-page-node-id="TNcuku6BTZ82kaZnZa2LZ8">开始 ▶</div></div>
+      <div class="menu-card" data-g="aero" data-page-node-id="2gzg3XSO7mdlWMh28He4J8"><div class="ic" data-page-node-id="pC03ahgK2vHJcA67K0qAkA">🎲</div><div class="nm" data-page-node-id="tR6ZbQ9kW12sCQkhImmMq9">飞行棋</div><div class="ds" data-page-node-id="85x27d8sXC9Jjs1l1SwWdr">1~4 人，自选红/黄/蓝/绿队伍，掷骰绕场抵达中心。可开关规则。</div><div class="go" data-page-node-id="CRk8jWmTilRkEXNvEY0UMW">开始 ▶</div></div>
+      <div class="menu-card" data-g="checkers" data-page-node-id="fZ4TXiCEoVZDdJQMRXthKh"><div class="ic" data-page-node-id="P6ZyYoNFN6obflwC8Ts3fl">🔷</div><div class="nm" data-page-node-id="0UjOGuuVLA6X4CdvlqCqGd">跳棋（中国跳棋）</div><div class="ds" data-page-node-id="fPDq60QiVz63o7Y7p5HP3Q">2~6 人，自选颜色与 AI 数量，连跳移动，把棋子移入对面角。4 档 AI。</div><div class="go" data-page-node-id="IE4TPW9eGxEyYHD0naKoQf">开始 ▶</div></div>
+      <div class="menu-card" data-g="weiqi" data-page-node-id="PVjF4uZEiYfdqvz7DwPABJ"><div class="ic" data-page-node-id="2WHDUnA1yo4pAVeOG18Zd4">⚪</div><div class="nm" data-page-node-id="zXf4iPTyJ03LCm3zEjD2dC">围棋</div><div class="ds" data-page-node-id="ooB6a3S1cpdizQDzYX960Y">9×9 棋盘，提子 / 打劫 / 围空，数子判定胜负（白贴 6.5 目）。人机 / 双人。</div><div class="go" data-page-node-id="j1FIIyn80D47h9ogETVwnb">开始 ▶</div></div>
+      <div class="menu-card" data-g="reversi" data-page-node-id="1WuMxnIErxdYK7wtM3UDPf"><div class="ic" data-page-node-id="dF3mnGHLueR0Tl9jktB1MW">⬛</div><div class="nm" data-page-node-id="H5UT7DgsM1jKNz9rBekByq">黑白棋</div><div class="ds" data-page-node-id="QCUvgkGMPjlplydqz4CHgf">8×8 棋盘，落子夹击翻转对方一片棋子，终局子多者胜。规则 1 分钟学会，AI 犀利。</div><div class="go" data-page-node-id="wD7pS0w1I8zCLdT30KjmUm">开始 ▶</div></div>
+      <div class="menu-card" data-g="jungle" data-page-node-id="ZXR4YLd56tiyrFLN3wUx7c"><div class="ic" data-page-node-id="eATJ3tpggV5d3EAPau3wrk">🐯</div><div class="nm" data-page-node-id="IpbssvlU3Bi9bYHIu9QZEj">斗兽棋</div><div class="ds" data-page-node-id="lZN5GWqk10GbeUY217ha78">鼠象互克、陷阱、兽穴、小河。8 种动物按等级吃子，走进对方兽穴即胜。4 档 AI。</div><div class="go" data-page-node-id="XeRODqaTHMbicA2eAJadCq">开始 ▶</div></div>
+      <div class="menu-card" data-g="four" data-page-node-id="EHDxncDEmd1yo8UxVnjmXJ"><div class="ic" data-page-node-id="7G5zKt9hkMlqxeqLLgCem2">🔴</div><div class="nm" data-page-node-id="o10tLdNFlYzU159KOh2i4s">四子棋</div><div class="ds" data-page-node-id="FpYl8vqNz0aB8SYJZmCi5k">7 列 × 6 行，落子靠重力下沉，率先连成四子（横/竖/斜）者胜。节奏快、联机超爽。</div><div class="go" data-page-node-id="LbwwgnJmEWPZLLncoTz5qR">开始 ▶</div></div>
+      <div class="menu-card" data-g="banqi" data-page-node-id="SUzPIh5pcLgD8KNuDjwfbo"><div class="ic" data-page-node-id="Rd0voi8Uery30hzlghydU2">🂠</div><div class="nm" data-page-node-id="dAHy96s6Tb6fSksos6sUvE">暗棋（翻棋）</div><div class="ds" data-page-node-id="c3T9CBDyH7RkCTpyw48K1C">棋子背面朝上，翻到才知敌我。按将/士/象/車/馬/包/兵等级吃子，吃掉对方「将」即胜。运气 + 策略。</div><div class="go" data-page-node-id="DJuHABP8ByTAAlonSiPk6k">开始 ▶</div></div>
+      <div class="menu-card" data-g="ttt" data-page-node-id="GREOk0Jo1UzMjLAA04szAa"><div class="ic" data-page-node-id="WWCDo81Ep324GywYyXZhHQ">✖️</div><div class="nm" data-page-node-id="6JQ19XP2Ftn9ceze7U1qya">井字棋</div><div class="ds" data-page-node-id="0cXxUBN6VvyCzhSid24jwi">3×3 经典对战，率先连成一线者胜。规则极简，适合和朋友随手来一局。</div><div class="go" data-page-node-id="uELSqAThkRuO5Y5vpX8RWC">开始 ▶</div></div>
+      <div class="menu-card" data-g="backgammon" data-page-node-id="bgMenu001"><div class="ic" data-page-node-id="bgIc001">🎲</div><div class="nm" data-page-node-id="bgNm001">双陆棋</div><div class="ds" data-page-node-id="bgDs001">掷两骰沿 24 点移动棋子，抢先把己方棋子全部移出棋盘即胜。含击落、内盘、收子等完整规则，4 档 AI。</div><div class="go" data-page-node-id="bgGo001">开始 ▶</div></div>
     </div>
   </div>
 
@@ -420,7 +454,7 @@ const ctrl = {
   game: 'xiangqi',     // 'xiangqi' | 'gomoku' | 'chess' | 'aero' | 'checkers' | 'weiqi'
   mode: 'ai',          // 'ai' | 'pvp'
   difficulty: 2,       // 0..3
-  playerColor: { xiangqi: 'red', gomoku: 'black', chess: 'white', aero: 'red', weiqi: 'b', reversi: 'black', jungle: 'red', four: 'red', banqi: 'red', ttt: 'X' }, // 玩家执子（围棋用 b/w 与棋盘一致）
+  playerColor: { xiangqi: 'red', gomoku: 'black', chess: 'white', aero: 'red', weiqi: 'b', reversi: 'black', jungle: 'red', four: 'red', banqi: 'red', ttt: 'X', backgammon: 'red' }, // 玩家执子（围棋用 b/w 与棋盘一致）
   aero: {
     players: 1,                       // 人类玩家人数 1/2/3/4
     aiCount: 3,                       // AI 队伍数量 0/1/2/3（与人类合计 2~4 队参战）
@@ -433,7 +467,8 @@ const ctrl = {
     humanTeams: [0]                   // 人类玩家所选的「家」索引（颜色 = 该家颜色）
   },
   online: { enabled:false, connected:false, role:null, myColor:null, mySeat:null, room:null, ws:null, server:'', turnStart:0, lastMover:null, moveLog:[], chat:[], resultRecorded:false, spectating:false, lobbyTimer:null },
-  flipManual: false        // 手动翻转棋盘（网格棋生效）
+  flipManual: false,
+  puzzle: null             // 残局解谜：当前挑战 {id,game,myColor,winBy,snapshot,solved,title}        // 手动翻转棋盘（网格棋生效）
 };
 // 返回当前模式下「人类所执颜色」：联机=myColor，人机=playerColor，双人=null（由模块用当前走子方判断）
 function humanColorFor(game){
@@ -703,10 +738,10 @@ const XQ = (function () {
   function setStatus(t){ $('status').textContent=t; }
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
-  return { init, undo, render, isBusy:()=>aiThinking, name:'xiangqi',
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'xiangqi',
     net: {
       get:()=>({ board, turn, gameOver, lastMove }),
-      set:(s)=>{ board=s.board; turn=s.turn; gameOver=s.gameOver; lastMove=s.lastMove||null; selected=null; legal=[]; aiThinking=false; render(); updateStatus(turn); }
+      set:(s)=>{ board=s.board; turn=s.turn; gameOver=s.gameOver; lastMove=s.lastMove||null; selected=null; legal=[]; history=[]; aiThinking=false; render(); updateStatus(turn); }
     }
   };
 })();
@@ -869,7 +904,7 @@ const GO = (function () {
   function place(r,c,pl){
     board[r][c]=pl; lastMove=[r,c]; history.push({r,c,pl});
     const w=checkWinAt(board,r,c,pl);
-    if(w){ gameOver=true; winner=pl; winLine=w; updateStatus(pl,'win'); render(); return; }
+    if(w){ gameOver=true; winner=pl; winLine=w; updateStatus(pl,'win'); render(); netAfterMove(); return; }
     turn = pl==='black'?'white':'black';
     addLog(pl,r,c); updateStatus(turn); render(); $('undoBtn').disabled=false; netAfterMove(); maybeAI();
   }
@@ -896,7 +931,7 @@ const GO = (function () {
   }
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
-  return { init, undo, render, isBusy:()=>aiThinking, name:'gomoku', _t:{ aiPick, wouldWin, candidates },
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'gomoku', _t:{ aiPick, wouldWin, candidates },
     net: {
       get:()=>({ board, turn, gameOver, winner, winLine, lastMove }),
       set:(s)=>{ board=s.board; turn=s.turn; gameOver=s.gameOver; winner=s.winner; winLine=s.winLine; lastMove=s.lastMove; history=[]; aiThinking=false; render(); updateStatus(turn, gameOver?'win':null); }
@@ -1075,11 +1110,11 @@ const CH = (function () {
   function aiMove(){ aiThinking=true; setStatus('AI 思考中…'); setTimeout(()=>{ const m=aiPick(aiSide(), ctrl.difficulty); aiThinking=false; if(m) doMove(m[0],m[1],m[2],m[3]); }, 60); }
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
-  return { init, undo, render, isBusy:()=>aiThinking, name:'chess',
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'chess',
     _t:{ legalMoves, inCheck, aiPick, makeMove, undoMove, board:()=>board, getState:()=>state, setBoard:(bd,st)=>{board=bd; state=st;}, start },
     net: {
       get:()=>({ board, state, gameOver, winner, turn: state.turn, lastMove }),
-      set:(s)=>{ board=s.board; state=s.state; gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove||null; selected=null; legal=[]; aiThinking=false; render(); updateStatus(gameOver?'mate':null); }
+      set:(s)=>{ board=s.board; state=s.state; gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove||null; selected=null; legal=[]; history=[]; aiThinking=false; render(); updateStatus(gameOver?'mate':null); }
     }
   };
 })();
@@ -1258,11 +1293,11 @@ const FL = (function () {
     if(!isHuman(color)) later(beginTurn,300); }
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
-  return { init, undo, render, isBusy:()=>aiThinking, name:'aero',
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'aero',
     _t:{ coordOf, moveToken, legalTokensFor, aiChooseToken, planes:()=>planes, setPlanes:(o)=>{planes=o;}, getState:()=>({gameOver,winner,finished:finishedList}), getFinished:()=>finishedList, aiTeams, getTurnOrder:()=>turnOrder, START, LOOP, isOwnColorCell, isFlyLaunch, currentColor, humanColors, isHuman, getCfg:()=>ctrl.aero, getTurnIdx:()=>turnIdx, rollDie, doMoveToken, getPhase:()=>phase, getDie:()=>die, legalTokensNow:()=>legalTokens, getThinking:()=>aiThinking, getGameOver:()=>gameOver },
     net: {
       get:()=>({ planes, turnIdx, die, phase, gameOver, winner, finishedList, turn:currentColor(), mover:currentColor(), lastMoveToken }),
-      set:(s)=>{ planes=s.planes; turnIdx=s.turnIdx; die=s.die; phase=s.phase; gameOver=s.gameOver; winner=s.winner; finishedList=s.finishedList||[]; lastMoveToken=s.lastMoveToken||null; aiThinking=false; render(); updateStatus(); }
+      set:(s)=>{ planes=s.planes; turnIdx=s.turnIdx; die=s.die; phase=s.phase; gameOver=s.gameOver; winner=s.winner; finishedList=s.finishedList||[]; lastMoveToken=s.lastMoveToken||null; history=[]; aiThinking=false; render(); updateStatus(); }
     }
   };
 })();
@@ -1442,7 +1477,7 @@ const CC = (function () {
       setTurn:(i)=>{turnIdx=i;}, maybeAI, beginTurn, undo, init },
     net: {
       get:()=>({ board, turnIdx, turn:currentIdx(), active, tgtMap, tgtApexMap, gameOver, winner, finishedList, mover:currentIdx(), lastMove }),
-      set:(s)=>{ board=s.board; turnIdx=s.turnIdx; active=s.active; tgtMap=s.tgtMap; tgtApexMap=s.tgtApexMap; gameOver=s.gameOver; winner=s.winner; finishedList=s.finishedList||[]; lastMove=s.lastMove||null; selected=null; legal=[]; aiThinking=false; render(); updateStatus(); }
+      set:(s)=>{ board=s.board; turnIdx=s.turnIdx; active=s.active; tgtMap=s.tgtMap; tgtApexMap=s.tgtApexMap; gameOver=s.gameOver; winner=s.winner; finishedList=s.finishedList||[]; lastMove=s.lastMove||null; selected=null; legal=[]; history=[]; aiThinking=false; render(); updateStatus(); }
     }
   };
 })();
@@ -1693,13 +1728,13 @@ const RV = (function () {
     log.appendChild(d); log.scrollTop = log.scrollHeight;
   }
 
-  return { init, undo, render, isBusy: () => aiThinking, name: 'reversi',
+  return { init, undo, render, isBusy: () => aiThinking, cellCenter:(r,c)=>({x:gx(c),y:gy(r)}), name: 'reversi',
     _t: { legalMoves, flipsFor, hasMove, count, aiPick, doMove, isHumanTurn,
       getBoard: () => board, setBoard: b => { board = b; }, getTurn: () => turn, setTurn: t => { turn = t; },
       getGameOver: () => gameOver, getWinner: () => winner },
     net: {
       get: () => ({ board, turn, mover: turn, gameOver, winner, lastMove }),
-      set: (s) => { board = s.board; turn = s.turn; gameOver = s.gameOver; winner = s.winner; lastMove = s.lastMove || null; aiThinking = false; render(); updateStatus(); }
+      set: (s) => { board = s.board; turn = s.turn; gameOver = s.gameOver; winner = s.winner; lastMove = s.lastMove || null; history = []; aiThinking = false; render(); updateStatus(); }
     }
   };
 })();
@@ -2019,13 +2054,13 @@ const JG = (function () {
     log.appendChild(d); log.scrollTop = log.scrollHeight;
   }
 
-  return { init, undo, render, isBusy: () => aiThinking, name: 'jungle',
+  return { init, undo, render, isBusy: () => aiThinking, cellCenter:(r,c)=>({x:gx(c),y:gy(r)}), name: 'jungle',
     _t: { genMoves, canCapture, isWater, trapOwner, denAt, aiPick, doMove, isHumanTurn, coord,
       getBoard: () => board, setBoard: b => { board = b; }, getTurn: () => turn, setTurn: t => { turn = t; },
       getLegal: () => legal, refreshLegal, getGameOver: () => gameOver, getWinner: () => winner },
     net: {
       get: () => ({ board, turn, mover: turn, gameOver, winner, lastMove, cntR, cntB }),
-      set: (s) => { board = s.board; turn = s.turn; gameOver = s.gameOver; winner = s.winner; lastMove = s.lastMove || null; cntR = s.cntR; cntB = s.cntB; selected = null; aiThinking = false; refreshLegal(); render(); updateStatus(); }
+      set: (s) => { board = s.board; turn = s.turn; gameOver = s.gameOver; winner = s.winner; lastMove = s.lastMove || null; cntR = s.cntR; cntB = s.cntB; selected = null; history = []; aiThinking = false; refreshLegal(); render(); updateStatus(); }
     }
   };
 })();
@@ -2113,9 +2148,9 @@ const FO = (function () {
   }
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
-  return { init, undo, render, isBusy:()=>aiThinking, name:'four',
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'four',
     net:{ get:()=>({ board, turn, gameOver, winner, lastMove }),
-      set:(s)=>{ board=s.board.map(r=>r.slice()); turn=s.turn; gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove||null; aiThinking=false; render(); updateStatus(s.gameOver?'win':''); } } };
+      set:(s)=>{ board=s.board.map(r=>r.slice()); turn=s.turn; gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove||null; history=[]; aiThinking=false; render(); updateStatus(s.gameOver?'win':''); } } };
 })();
 
 // ====================== 暗棋（Banqi / 翻棋） ======================
@@ -2263,9 +2298,9 @@ const BQ = (function () {
     if(flips.length){ const f=flips[Math.floor(Math.random()*flips.length)]; return {type:'flip',r:f.r,c:f.c}; }
     return null;
   }
-  return { init, undo, render, isBusy:()=>aiThinking, name:'banqi',
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'banqi',
     net:{ get:()=>({ board: board.map(r=>r.map(p=>p?{side:p.side,type:p.type,up:p.up}:null)), turn, gameOver, winner, lastMove }),
-      set:(s)=>{ board=s.board.map(r=>r.map(p=>p?{side:p.side,type:p.type,up:p.up}:null)); turn=s.turn; gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove||null; selected=null; legal=[]; aiThinking=false; render(); updateStatus(s.gameOver?'win':''); } } };
+      set:(s)=>{ board=s.board.map(r=>r.map(p=>p?{side:p.side,type:p.type,up:p.up}:null)); turn=s.turn; gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove||null; selected=null; legal=[]; history=[]; aiThinking=false; render(); updateStatus(s.gameOver?'win':''); } } };
 })();
 
 // ====================== 井字棋（Tic-Tac-Toe） ======================
@@ -2325,8 +2360,245 @@ const TT = (function () {
   }
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
-  return { init, undo, render, isBusy:()=>aiThinking, name:'ttt',
-    net:{ get:()=>({ board: board.map(r=>r.slice()), turn, gameOver, winner, lastMove }), set:(s)=>{ board=s.board.map(r=>r.slice()); turn=s.turn; gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove||null; aiThinking=false; render(); updateStatus(s.gameOver?(s.winner?'win':'draw'):''); } } };
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'ttt',
+    net:{ get:()=>({ board: board.map(r=>r.slice()), turn, gameOver, winner, lastMove }), set:(s)=>{ board=s.board.map(r=>r.slice()); turn=s.turn; gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove||null; history=[]; aiThinking=false; render(); updateStatus(s.gameOver?(s.winner?'win':'draw'):''); } } };
+})();
+
+const BG = (function () {
+  const MARGIN=12, PW=48, BARW=36, TRAYW=60, CR=16;
+  const W=MARGIN*2+PW*12+BARW+TRAYW;
+  const H=MARGIN*2+300;
+  const POINT_H=(H-2*MARGIN)/2-8;
+  const canvas=$('boardBG'); const ctx=canvas.getContext('2d');
+  canvas.width=W; canvas.height=H;
+  const COL={red:'#c0392b', black:'#2c3e50'};
+  // 底排点(左→右): 11,10,9,8,7,6 | 中bar | 5,4,3,2,1,0  (0 在右下，红收子区)
+  // 顶排点(左→右): 12,13,14,15,16,17 | 中bar | 18,19,20,21,22,23 (23 在右上)
+  function pointXY(i){
+    const top=i>=12;
+    let half, idx;
+    if(!top){ if(i>=6){ half='L'; idx=11-i; } else { half='R'; idx=5-i; } }
+    else { if(i<=17){ half='L'; idx=i-12; } else { half='R'; idx=i-18; } }
+    const leftW=PW*6;
+    const x = half==='L' ? (MARGIN+idx*PW+PW/2) : (MARGIN+leftW+BARW+idx*PW+PW/2);
+    return { x, top };
+  }
+  function checkerPos(i,k){ const {x,top}=pointXY(i); const y = top ? (MARGIN+CR+k*CR*2) : (H-MARGIN-CR-k*CR*2); return {x,y}; }
+  function other(c){ return c==='red'?'black':'red'; }
+  function inHome(c,i){ return c==='red' ? (i>=0&&i<=5) : (i>=18&&i<=23); }
+  function entryPoint(c,d){ return c==='red' ? 24-d : d-1; }
+  function target(c,p,d){ return c==='red' ? p-d : p+d; }
+  function blockedBy(p,c){ return points[p].c!==0 && points[p].c!==c && points[p].n>=2; }
+
+  let points, bar, off, turn, dice, remaining, phase, selected, legalForSel, gameOver, winner, history, aiThinking, gen, lastMove;
+
+  function allHome(c){
+    if(bar[c]>0) return false;
+    for(let i=0;i<24;i++){ if(points[i].c===c && !inHome(c,i)) return false; }
+    return true;
+  }
+  function bearOffMove(c,i,d){
+    if(c==='red'){
+      const exact=d-1; if(i===exact) return true;
+      let hp=-1; for(let k=0;k<=5;k++) if(points[k].c==='red'&&points[k].n>0) hp=Math.max(hp,k);
+      return i===hp && i<exact;
+    } else {
+      const exact=24-d; if(i===exact) return true;
+      let hp=99; for(let k=18;k<=23;k++) if(points[k].c==='black'&&points[k].n>0) hp=Math.min(hp,k);
+      return i===hp && i>exact;
+    }
+  }
+  function legalMovesForDie(d){
+    const c=turn, res=[];
+    if(bar[c]>0){
+      const e=entryPoint(c,d);
+      if(!blockedBy(e,c)) res.push({from:'bar',to:e,die:d,hit: points[e].c===other(c)&&points[e].n===1,bear:false});
+      return res;
+    }
+    for(let i=0;i<24;i++){
+      if(points[i].c!==c||points[i].n===0) continue;
+      if(allHome(c)&&inHome(c,i)&&bearOffMove(c,i,d)) res.push({from:i,to:'off',die:d,hit:false,bear:true});
+      const t=target(c,i,d);
+      if(t>=0&&t<=23 && !blockedBy(t,c)) res.push({from:i,to:t,die:d,hit: points[t].c===other(c)&&points[t].n===1,bear:false});
+    }
+    return res;
+  }
+  function anyLegalMove(){ for(const d of remaining){ if(legalMovesForDie(d).length) return true; } return false; }
+
+  function init(){
+    points=Array.from({length:24},()=>({n:0,c:0}));
+    const setp=(i,c,n)=>{ points[i]={n,c}; };
+    setp(23,'red',2); setp(12,'red',5); setp(8,'red',3); setp(6,'red',5);
+    setp(0,'black',2); setp(11,'black',5); setp(16,'black',3); setp(18,'black',5);
+    bar={red:0,black:0}; off={red:0,black:0}; turn='red'; dice=null; remaining=[]; phase='roll';
+    selected=null; legalForSel=[]; gameOver=false; winner=null; history=[]; aiThinking=false; gen=0; lastMove=null;
+    $('undoBtn').disabled=true; updateStatus(); render(); maybeAI();
+  }
+  function playerSide(){ return ctrl.playerColor.backgammon; }
+  function isHumanTurn(){ return ctrl.mode!=='ai' || turn===playerSide(); }
+  function later(fn,ms){ const g=gen; setTimeout(()=>{ if(g===gen) fn(); }, ms); }
+  function maybeAI(){ if(ctrl.mode!=='ai'||gameOver) return; if(turn===playerSide()) return; if(aiThinking) return; if(phase==='roll') aiRoll(); else if(phase==='move') aiMove(); }
+  function aiRoll(){ aiThinking=true; setStatus('AI 思考中…'); later(()=>{ doRoll(); aiThinking=false; if(phase==='move') aiMove(); }, 250); }
+
+  function doRoll(){
+    const d1=1+Math.floor(Math.random()*6), d2=1+Math.floor(Math.random()*6);
+    dice=[d1,d2]; remaining=(d1===d2)?[d1,d1,d1,d1]:[d1,d2]; phase='move';
+    if(!anyLegalMove()){ addLog(turn,'掷出 '+dice.join(',')+'，无子可走，跳过'); later(endTurn,500); }
+    else updateStatus();
+    render();
+  }
+  function selectBar(){ if(bar[turn]>0){ selected='bar'; legalForSel=[]; for(const d of remaining) for(const m of legalMovesForDie(d)) if(m.from==='bar') legalForSel.push(m); render(); } }
+  function selectPoint(i){ selected=i; legalForSel=[]; for(const d of remaining) for(const m of legalMovesForDie(d)) if(m.from===i) legalForSel.push(m); render(); }
+  function endTurn(){ turn=other(turn); dice=null; remaining=[]; selected=null; legalForSel=[]; phase='roll'; updateStatus(); render(); maybeAI(); }
+
+  function applyMoveCore(m){
+    const c=turn;
+    if(m.from==='bar') bar[c]--; else { points[m.from].n--; if(points[m.from].n===0) points[m.from].c=0; }
+    if(m.bear) off[c]++;
+    else { const t=m.to; if(points[t].c===other(c)&&points[t].n===1){ bar[other(c)]++; points[t]={n:0,c:0}; } points[t].n++; points[t].c=c; }
+    const di=remaining.indexOf(m.die); if(di>=0) remaining.splice(di,1);
+    lastMove = (m.to==='off') ? null : m.to;
+    $('undoBtn').disabled=false;
+    addLog(c, m.bear?('从 '+ptName(m.from)+' 收子离场') : (m.from==='bar'?('禁着区 → '+ptName(m.to)) : (ptName(m.from)+' → '+ptName(m.to)+(m.hit?'（打吃）':''))));
+    if(off[c]===15){ gameOver=true; winner=c; }
+  }
+  function afterHumanMove(){
+    updateStatus();
+    if(gameOver){ render(); netAfterMove(); return; }
+    if(remaining.length===0 || !anyLegalMove()){ render(); netAfterMove(); endTurn(); return; }
+    selected=null; legalForSel=[]; render(); netAfterMove();
+  }
+  function aiMove(){
+    aiThinking=true; setStatus('AI 思考中…');
+    later(()=>{
+      let g=0;
+      while(remaining.length && !gameOver && g++<10){
+        const m=aiPick(); if(!m) break; pushHistory(); applyMoveCore(m);
+      }
+      aiThinking=false; render(); netAfterMove();
+      if(gameOver) return;
+      if(remaining.length===0 || !anyLegalMove()) endTurn();
+    }, 250);
+  }
+  function aiPick(){
+    const moves=[];
+    for(const d of remaining) for(const m of legalMovesForDie(d)) moves.push(m);
+    if(!moves.length) return null;
+    moves.sort((a,b)=> (b.hit-a.hit) || ((b.bear?1:0)-(a.bear?1:0)) || ((points[a.from]?points[a.from].n:99)-(points[b.from]?points[b.from].n:99)) || (Math.random()-0.5));
+    return moves[0];
+  }
+  function pushHistory(){ history.push({ points:points.map(p=>({n:p.n,c:p.c})), bar:{red:bar.red,black:bar.black}, off:{red:off.red,black:off.black}, turn, dice:dice?dice.slice():null, remaining:remaining.slice(), gameOver, winner, lastMove }); }
+  function restore(s){ points=s.points.map(p=>({n:p.n,c:p.c})); bar={red:s.bar.red,black:s.bar.black}; off={red:s.off.red,black:s.off.black}; turn=s.turn; dice=s.dice?s.dice.slice():null; remaining=s.remaining.slice(); gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove; }
+
+  function onClick(e){
+    if(gameOver||aiThinking) return; if(!netInputAllowed()) return; if(ctrl.mode==='ai'&&turn!==playerSide()) return;
+    if(phase==='roll'){ if(ctrl.mode!=='ai'||turn===playerSide()){ pushHistory(); doRoll(); } return; }
+    if(phase!=='move') return;
+    const ht=hitTest(e);
+    if(ht.type==='bar'){ if(bar[turn]>0) selectBar(); return; }
+    if(ht.type==='point'){ const i=ht.i; if(points[i].c===turn&&points[i].n>0){ selectPoint(i); return; } }
+    if(ht.type==='off'){ if(selected!=null){ const mv=legalForSel.find(m=>m.bear); if(mv){ pushHistory(); applyMoveCore(mv); afterHumanMove(); } return; } }
+    if(ht.type==='point' && selected!=null){
+      const i=ht.i; const mv=legalForSel.find(m=>m.to===i) || legalForSel.find(m=>m.to==='off'&&i===999);
+      if(mv){ pushHistory(); applyMoveCore(mv); afterHumanMove(); return; }
+    }
+    selected=null; legalForSel=[]; render();
+  }
+  function hitTest(e){
+    const rect=canvas.getBoundingClientRect();
+    const x=(e.clientX-rect.left)*(canvas.width/rect.width), y=(e.clientY-rect.top)*(canvas.height/rect.height);
+    // 中bar
+    const leftW=PW*6; const barX0=MARGIN+leftW, barX1=barX0+BARW;
+    if(x>=barX0&&x<=barX1) return {type:'bar'};
+    // 收子区（右侧 tray）
+    const trayX0=W-MARGIN-TRAYW;
+    if(x>=trayX0){ const isTop=y<H/2; if((isTop&&turn==='black')||(!isTop&&turn==='red')) return {type:'off'}; return {type:'none'}; }
+    // 点
+    const halfLeft = x < barX0;
+    const within = halfLeft ? (x-MARGIN) : (x-barX1);
+    const idx=Math.floor(within/PW);
+    let i;
+    if(y<H/2){ i = halfLeft ? (12+idx) : (18+idx); }
+    else { i = halfLeft ? (11-idx) : (5-idx); }
+    if(i>=0&&i<24) return {type:'point',i};
+    return {type:'none'};
+  }
+
+  function undo(){
+    if(aiThinking||history.length===0) return;
+    const s=history.pop(); restore(s); gameOver=false; winner=null; selected=null; legalForSel=[];
+    updateStatus(); render(); if(history.length===0) $('undoBtn').disabled=true;
+    if(ctrl.mode==='ai' && turn!==playerSide() && !gameOver) maybeAI();
+  }
+  function ptName(i){ return i==='bar'?'禁着区':(i==='off'?'离场':'第'+(i+1)+'点'); }
+
+  function updateStatus(flag){
+    const dot=$('turnDot'), txt=$('turnText'), st=$('status'); dot.className='dot '+turn; st.className='status';
+    if(flag==='win'){ txt.textContent=(winner==='red'?'红方':'黑方')+'胜'; st.textContent=(winner==='red'?'红方':'黑方')+'全部收子离场，获胜 🎉'; return; }
+    if(phase==='roll'){ const who=(ctrl.mode==='ai'&&turn!==playerSide())?'（AI）':''; txt.textContent=(turn==='red'?'红方':'黑方')+who+' 掷骰'; st.textContent='轮到 '+(turn==='red'?'红方':'黑方')+'：点棋盘掷骰'; return; }
+    txt.textContent=(turn==='red'?'红方':'黑方')+' 走子';
+    const ds=remaining.length?(' 骰子 '+remaining.join('/')):'';
+    st.textContent='轮到 '+(turn==='red'?'红方':'黑方')+' 走子'+ds;
+  }
+  function setStatus(t){ $('status').textContent=t; }
+  function addLog(c,t){ const log=$('log'); const d=document.createElement('div'); d.innerHTML='<span style="color:'+COL[c]+'">●</span> '+t; log.appendChild(d); log.scrollTop=log.scrollHeight; }
+  function cellCenter(i){ const {x,top}=pointXY(i); const y= top? (MARGIN+CR) : (H-MARGIN-CR); return {x,y}; }
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#3a2a18'; ctx.fillRect(0,0,W,H);
+    // 中线 + bar + tray
+    const leftW=PW*6, barX0=MARGIN+leftW, barX1=barX0+BARW, trayX0=W-MARGIN-TRAYW;
+    ctx.fillStyle='#5a3a1a'; ctx.fillRect(barX0,0,BARW,H);
+    ctx.fillStyle='#241a10'; ctx.fillRect(trayX0,0,TRAYW,H);
+    // 24 点三角
+    for(let i=0;i<24;i++){
+      const {x,top}=pointXY(i);
+      const c1=(i%2===0)?'#e9dcc0':'#caa46a';
+      ctx.fillStyle=c1; ctx.beginPath();
+      if(top){ ctx.moveTo(x-PW/2+3,MARGIN); ctx.lineTo(x+PW/2-3,MARGIN); ctx.lineTo(x,MARGIN+POINT_H); }
+      else { ctx.moveTo(x-PW/2+3,H-MARGIN); ctx.lineTo(x+PW/2-3,H-MARGIN); ctx.lineTo(x,H-MARGIN-POINT_H); }
+      ctx.closePath(); ctx.fill();
+    }
+    // 棋子
+    function drawStack(i){
+      const n=points[i].n; if(!n) return; const col=COL[points[i].c];
+      const show=Math.min(n,5);
+      for(let k=0;k<show;k++){ const {x,y}=checkerPos(i,k); drawChecker(x,y,col); }
+      if(n>5){ const {x,y}=checkerPos(i,4); ctx.fillStyle='#fff'; ctx.font='bold 12px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('+'+(n-5), x, y); }
+    }
+    for(let i=0;i<24;i++) drawStack(i);
+    // bar
+    if(bar.red>0) drawStackBar('red', bar.red, false);
+    if(bar.black>0) drawStackBar('black', bar.black, true);
+    // 离场区
+    if(off.red>0) drawTray('red', off.red, false);
+    if(off.black>0) drawTray('black', off.black, true);
+    // 选中高亮 + 合法落点
+    if(selected!=null){
+      // 源点描边
+      if(selected==='bar'){ ctx.strokeStyle='#e67e22'; ctx.lineWidth=3; ctx.strokeRect(barX0+3,0,BARW-6,H); }
+      else { const {x,top}=pointXY(selected); const y0= top?MARGIN:H-MARGIN-POINT_H; ctx.strokeStyle='#e67e22'; ctx.lineWidth=3; ctx.strokeRect(x-PW/2+3,y0,PW-6,POINT_H); }
+      for(const m of legalForSel){
+        if(m.bear){ // 离场区高亮
+          const tx=trayX0+TRAYW/2, ty=(turn==='red')?(H*0.75):(H*0.25);
+          ctx.beginPath(); ctx.arc(tx,ty,CR+4,0,Math.PI*2); ctx.fillStyle='rgba(46,204,113,.85)'; ctx.fill();
+        } else { const {x,y}=checkerPos(m.to,0); ctx.beginPath(); ctx.arc(x,y,CR*0.7,0,Math.PI*2); ctx.fillStyle='rgba(46,204,113,.9)'; ctx.fill(); }
+      }
+    }
+    // 骰子
+    if(dice){ const dy = H/2; ctx.fillStyle='#faf3e6'; for(let k=0;k<dice.length;k++){ const dx=MARGIN+30+k*40; roundRect(dx-14,dy-14,28,28,6); ctx.fill(); drawPips(dx,dy,dice[k]); } }
+    function drawChecker(x,y,col){ ctx.beginPath(); ctx.arc(x,y,CR,0,Math.PI*2); ctx.fillStyle=col; ctx.fill(); ctx.lineWidth=2; ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.stroke(); }
+    function drawStackBar(c,n,bot){ const x=barX0+BARW/2; let y= bot? H-MARGIN-CR : MARGIN+CR; for(let k=0;k<Math.min(n,5);k++){ drawChecker(x,y,c); y += bot? -CR*2 : CR*2; } if(n>5){ ctx.fillStyle='#fff'; ctx.font='bold 12px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('+'+(n-5),x,y); } }
+    function drawTray(c,n,bot){ const x=trayX0+TRAYW/2; let y= bot? H-MARGIN-CR : MARGIN+CR; for(let k=0;k<Math.min(n,5);k++){ drawChecker(x,y,c); y += bot? -CR*1.5 : CR*1.5; } if(n>5){ ctx.fillStyle='#fff'; ctx.font='bold 12px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('+'+(n-5),x,y); } }
+    function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+    function drawPips(cx,cy,v){ ctx.fillStyle='#2c3e50'; const o=8; const P={1:[[0,0]],2:[[-o,-o],[o,o]],3:[[-o,-o],[0,0],[o,o]],4:[[-o,-o],[o,-o],[-o,o],[o,o]],5:[[-o,-o],[o,-o],[0,0],[-o,o],[o,o]],6:[[-o,-o],[o,-o],[-o,0],[o,0],[-o,o],[o,o]]}; for(const [px,py] of P[v]){ ctx.beginPath(); ctx.arc(cx+px,cy+py,3,0,Math.PI*2); ctx.fill(); } }
+  }
+  canvas.addEventListener('click', onClick);
+  canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
+  return { init, undo, render, isBusy:()=>aiThinking, name:'backgammon', cellCenter,
+    net:{ get:()=>({ points:points.map(p=>({n:p.n,c:p.c})), bar:{red:bar.red,black:bar.black}, off:{red:off.red,black:off.black}, turn, dice:dice?dice.slice():null, remaining:remaining.slice(), gameOver, winner, lastMove }),
+      set:(s)=>{ points=s.points.map(p=>({n:p.n,c:p.c})); bar={red:s.bar.red,black:s.bar.black}; off={red:s.off.red,black:s.off.black}; turn=s.turn; dice=s.dice?s.dice.slice():null; remaining=(s.remaining||[]).slice(); gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove||null; history=[]; aiThinking=false; selected=null; legalForSel=[]; phase='move'; render(); updateStatus(s.gameOver?'win':''); } } };
 })();
 
 const WG = (function () {
@@ -2467,13 +2739,13 @@ const WG = (function () {
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
   canvas.addEventListener('contextmenu', onContext);
-  return { init, undo, render, isBusy:()=>aiThinking, name:'weiqi',
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:gx(c),y:gy(r)}), name:'weiqi',
     _t:{ S, getBoard:()=>board, setBoard:b=>{board=b;}, tryMove, group, neighbors, other,
       getTurn:()=>turn, setTurn:t=>{turn=t;}, doMove, passMove, getGameOver:()=>gameOver, getWinner:()=>winner,
       getCaptures:()=>captures, aiPick, init },
     net: {
       get:()=>({ board, turn, captures, koRef, passes, gameOver, winner, scoreLine, lastMove }),
-      set:(s)=>{ board=s.board; turn=s.turn; captures=s.captures; koRef=s.koRef; passes=s.passes; gameOver=s.gameOver; winner=s.winner; scoreLine=s.scoreLine||''; lastMove=s.lastMove; aiThinking=false; render(); updateStatus(); }
+      set:(s)=>{ board=s.board; turn=s.turn; captures=s.captures; koRef=s.koRef; passes=s.passes; gameOver=s.gameOver; winner=s.winner; scoreLine=s.scoreLine||''; lastMove=s.lastMove; history=[]; aiThinking=false; render(); updateStatus(); }
     }
   };
 })();
@@ -2502,6 +2774,30 @@ function netAfterMove(){
   // 单人 / 双人模式：记录复盘快照 + 音效
   const s=current().net.get();
   if(s){ REPLAY.snaps.push(deepClone(s)); if(REPLAY.snaps.length>500) REPLAY.snaps.shift(); playMoveSound(); if(s.gameOver && s.winner) playWinSound(s.winner); }
+  if(ctrl.puzzle) checkPuzzleWin();
+}
+const GAME_CANVAS = { xiangqi:'boardXQ', gomoku:'boardGO', chess:'boardCH', aero:'boardFL', checkers:'boardCC', weiqi:'boardWG', reversi:'boardRV', jungle:'boardJG', four:'boardFO', banqi:'boardBQ', ttt:'boardTT', backgammon:'boardBG' };
+let __animRAF=null;
+function animLastMove(){
+  if(typeof requestAnimationFrame!=='function') return;
+  const g=ctrl.game, m=current(); if(!m||!m.cellCenter) return;
+  const s=m.net.get(); if(!s||!s.lastMove) return;
+  let pos=null;
+  if(g==='backgammon'){ if(typeof s.lastMove==='number') pos=m.cellCenter(s.lastMove); }
+  else { const lm=s.lastMove; if(Array.isArray(lm)&&lm.length===2) pos=m.cellCenter(lm[0],lm[1]); }
+  if(!pos) return;
+  const cv=$(GAME_CANVAS[g]); if(!cv) return; const xc=cv.getContext('2d');
+  if(__animRAF) cancelAnimationFrame(__animRAF);
+  let t0=null; const dur=300;
+  function frame(ts){ if(t0===null)t0=ts; const p=Math.min(1,(ts-t0)/dur);
+    m.render();
+    xc.save(); xc.globalAlpha=1-p; xc.strokeStyle='#e67e22'; xc.lineWidth=4;
+    xc.beginPath(); xc.arc(pos.x,pos.y,24+p*28,0,Math.PI*2); xc.stroke();
+    xc.globalAlpha=1-p*0.5; xc.fillStyle='#e67e22'; xc.beginPath(); xc.arc(pos.x,pos.y,20*(1-0.5*p),0,Math.PI*2); xc.fill();
+    xc.restore();
+    if(p<1) __animRAF=requestAnimationFrame(frame); else { m.render(); __animRAF=null; }
+  }
+  __animRAF=requestAnimationFrame(frame);
 }
 function sendNet(obj){ if(obj && obj.t==='state') publishState(false); }
 function setNetStatus(t){ const el=$('netStatus'); if(el) el.textContent=t; }
@@ -2524,6 +2820,7 @@ function applyOnlineSetup(role){
   else if(g==='ttt'){ const mc = role==='host'?'X':'O'; ctrl.playerColor.ttt=mc; ctrl.online.myColor=mc; }
   else if(g==='aero'){ ctrl.aero.players=2; ctrl.aero.aiCount=0; const me=role==='host'?'red':'yellow', op=role==='host'?'yellow':'red'; ctrl.aero.humanTeams=[me,op]; ctrl.online.myColor=me; }
   else if(g==='checkers'){ ctrl.checkers.players=2; ctrl.checkers.aiCount=0; ctrl.checkers.humanTeams=[0,3]; ctrl.online.myColor = role==='host'?0:3; ctrl.online.mySeat = role==='host'?0:1; }
+  else if(g==='backgammon'){ const mc = role==='host'?'red':'black'; ctrl.playerColor.backgammon=mc; ctrl.online.myColor=mc; }
 }
 // 联机：经公共 MQTT 中继转发（默认 EMQX 公共 broker，国内可达），纯 WebSocket，无需 WebRTC/STUN
 let mqClient=null;
@@ -2798,10 +3095,10 @@ function colorLabel(g,v){
   if(g==='aero') return (AERO_TEAMS.find(t=>t[0]===v)||[v,v])[1];
   return (PIECE_TEAMS[g]||{})[v]||v;
 }
-function mapColor(g,v){ if(g==='aero'||g==='xiangqi'||g==='weiqi'||g==='four'||g==='banqi'||g==='ttt') return v; return v==='red'?'white':'black'; }
+function mapColor(g,v){ if(g==='aero'||g==='xiangqi'||g==='weiqi'||g==='four'||g==='banqi'||g==='ttt'||g==='backgammon') return v; return v==='red'?'white':'black'; }
 const AERO_TEAMS=[['red','红队'],['yellow','黄队'],['blue','蓝队'],['green','绿队']];
 const AERO_COLORS=AERO_TEAMS.map(t=>t[0]);
-const PIECE_TEAMS={ xiangqi:{red:'执红(先手)',black:'执黑'}, gomoku:{red:'执白',black:'执黑(先手)'}, chess:{red:'执白(先手)',black:'执黑'}, weiqi:{b:'执黑(先手)',w:'执白'}, reversi:{black:'执黑(先手)',white:'执白'}, jungle:{red:'执红(先手)',black:'执黑'}, four:{red:'执红(先手)',yellow:'执黄'}, banqi:{red:'执红(先手)',black:'执黑'}, ttt:{X:'执 X(先手)',O:'执 O'} };
+const PIECE_TEAMS={ xiangqi:{red:'执红(先手)',black:'执黑'}, gomoku:{red:'执白',black:'执黑(先手)'}, chess:{red:'执白(先手)',black:'执黑'}, weiqi:{b:'执黑(先手)',w:'执白'}, reversi:{black:'执黑(先手)',white:'执白'}, jungle:{red:'执红(先手)',black:'执黑'}, four:{red:'执红(先手)',yellow:'执黄'}, banqi:{red:'执红(先手)',black:'执黑'}, ttt:{X:'执 X(先手)',O:'执 O'}, backgammon:{red:'执红(先手)',black:'执黑'} };
 function buildColorSeg(){
   const seg=$('colorSeg'); const g=ctrl.game;
   const defs = g==='aero' ? AERO_TEAMS : Object.entries(PIECE_TEAMS[g]||{red:'红',black:'黑'});
@@ -2813,7 +3110,7 @@ function buildColorSeg(){
   for(const [v] of defs){ if(mapColor(g,v)===ctrl.playerColor[g]){ activeV=v; break; } }
   seg.querySelectorAll('button').forEach(b=> b.classList.toggle('on', b.dataset.v===activeV));
 }
-function current(){ return ctrl.game==='xiangqi'?XQ : ctrl.game==='gomoku'?GO : ctrl.game==='chess'?CH : ctrl.game==='aero'?FL : ctrl.game==='checkers'?CC : ctrl.game==='reversi'?RV : ctrl.game==='jungle'?JG : ctrl.game==='four'?FO : ctrl.game==='banqi'?BQ : ctrl.game==='ttt'?TT : WG; }
+function current(){ return ctrl.game==='xiangqi'?XQ : ctrl.game==='gomoku'?GO : ctrl.game==='chess'?CH : ctrl.game==='aero'?FL : ctrl.game==='checkers'?CC : ctrl.game==='reversi'?RV : ctrl.game==='jungle'?JG : ctrl.game==='four'?FO : ctrl.game==='banqi'?BQ : ctrl.game==='ttt'?TT : ctrl.game==='backgammon'?BG : WG; }
 function clampAero(){
   let ai = ctrl.aero.aiCount;
   ai = Math.max(0, Math.min(ai, 4 - ctrl.aero.players));   // 合计不超过 4 队
@@ -2866,6 +3163,8 @@ function buildCcTeamPickers(){
 function refresh(){
   game=current();
   REPLAY.snaps=[]; REPLAY.active=false; REPLAY.idx=0; const rb=$('replayBar'); if(rb) rb.style.display='none';
+  if(ctrl.puzzle && ctrl.game!==ctrl.puzzle.game){ ctrl.puzzle=null; }
+  if(ctrl.puzzle){ const rs=$('modeSeg').closest('.row'); if(rs) rs.style.display='none'; const ds=$('diffSeg').closest('.row'); if(ds) ds.style.display='none'; const cr=$('colorRow'); if(cr) cr.style.display='none'; }
   ctrl.online.resultRecorded=false; updateScoreBox();
   $('modeSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on', x.dataset.v===ctrl.mode));
   $('boardXQ').classList.toggle('show', ctrl.game==='xiangqi');
@@ -2879,6 +3178,7 @@ function refresh(){
   $('boardFO').classList.toggle('show', ctrl.game==='four');
   $('boardBQ').classList.toggle('show', ctrl.game==='banqi');
   $('boardTT').classList.toggle('show', ctrl.game==='ttt');
+  $('boardBG').classList.toggle('show', ctrl.game==='backgammon');
   const isAero = ctrl.game==='aero';
   const isCheckers = ctrl.game==='checkers';
   const isWeiqi = ctrl.game==='weiqi';
@@ -2907,9 +3207,9 @@ function refresh(){
     buildColorSeg();
   }
   $('log').innerHTML=''; $('undoBtn').disabled=true;
-  game.init();
+  if(ctrl.puzzle){ loadPuzzle(); } else { game.init(); }
 }
-const tabs=[['tabXQ','xiangqi'],['tabGO','gomoku'],['tabCH','chess'],['tabFL','aero'],['tabCC','checkers'],['tabWG','weiqi'],['tabRV','reversi'],['tabJG','jungle'],['tabFO','four'],['tabBQ','banqi'],['tabTT','ttt']];
+const tabs=[['tabXQ','xiangqi'],['tabGO','gomoku'],['tabCH','chess'],['tabFL','aero'],['tabCC','checkers'],['tabWG','weiqi'],['tabRV','reversi'],['tabJG','jungle'],['tabFO','four'],['tabBQ','banqi'],['tabTT','ttt'],['tabBG','backgammon']];
 const hints={
   xiangqi:'象棋：红先黑后。点击己方棋子选中，再点高亮处落子。含车马炮将士象规则、将军/将死判定。',
   gomoku:'五子棋：黑先白后，先连成五子者胜（含禁手）。人机模式下你执选定颜色，AI 自动应对。',
@@ -2922,8 +3222,73 @@ const hints={
   , four:'四子棋（Connect Four）：红先。点某一列，棋子受重力落到该列最底空位。率先在横/竖/斜方向连成 4 子者胜。简单却极易上瘾，联机对战尤其爽快。'
   , banqi:'暗棋（翻棋）：所有棋子背面朝上，背面的红/黑代表所属阵营。轮到你时，可翻开一枚「己方颜色」的暗子（翻出即归你），或移动己方明子去吃对方明子。吃子按 将>士>象>車>馬>包>兵 的等级：包需隔一子跳吃（可吃将），兵不能吃包也不能吃兵，将不能吃包也不能吃将。吃掉对方「将」即胜；若对方无棋可动也判你胜。'
   , ttt:'井字棋（Tic-Tac-XO）：X 先手。轮流在 3×3 格落子，率先连成一条横线/竖线/斜线者胜。规则极简，适合和朋友随手来一局。'
+  , backgammon:'双陆棋（Backgammon）：红方先手。轮流掷两骰，按点数沿 24 个点逆时针移动棋子；把己方棋子全部移入本方内盘并逐枚移出棋盘即胜；落在仅有一枚己方棋子的点可「击落」对方棋子至中柱。点「掷骰」开始，选棋子再点高亮的可走点落子。'
 };
-tabs.forEach(([id,g])=>$(id).addEventListener('click',()=>{ if(ctrl.online.enabled){ netLeave(); ctrl.mode='ai'; } ctrl.game=g; tabs.forEach(([i])=>$(i).classList.toggle('active', i===id)); setHint(hints[g]); refresh(); }));
+
+// ===== 残局 / 解谜模式 =====
+function _pgrid(rows, cols, fill){ return Array.from({length:rows},()=>Array.from({length:cols},()=>fill)); }
+const PUZZLES = [
+  { id:'ttt-1', game:'ttt', icon:'✖️', title:'井字·一字定胜', desc:'X 再落一子即可连成一线', myColor:'X', winBy:'X',
+    snapshot:()=>{ const b=_pgrid(3,3,null); b[0][0]='X'; b[0][1]='X'; b[1][1]='O'; return { board:b, turn:'X', gameOver:false, winner:null, lastMove:null }; } },
+  { id:'ttt-2', game:'ttt', icon:'✖️', title:'井字·斜线杀', desc:'X 落对角即成斜线', myColor:'X', winBy:'X',
+    snapshot:()=>{ const b=_pgrid(3,3,null); b[0][0]='X'; b[1][1]='X'; b[0][2]='O'; return { board:b, turn:'X', gameOver:false, winner:null, lastMove:null }; } },
+  { id:'four-1', game:'four', icon:'🔴', title:'四子·垂直四连', desc:'红方在第 4 列落子即竖成四子', myColor:'red', winBy:'red',
+    snapshot:()=>{ const b=_pgrid(6,7,null); b[5][3]='red'; b[4][3]='red'; b[3][3]='red'; return { board:b, turn:'red', gameOver:false, winner:null, lastMove:null }; } },
+  { id:'four-2', game:'four', icon:'🔴', title:'四子·横扫千军', desc:'红方落第 5 列即横成四子', myColor:'red', winBy:'red',
+    snapshot:()=>{ const b=_pgrid(6,7,null); b[5][1]='red'; b[5][2]='red'; b[5][3]='red'; return { board:b, turn:'red', gameOver:false, winner:null, lastMove:null }; } },
+  { id:'gomoku-1', game:'gomoku', icon:'⚫', title:'五子·白珠连珠', desc:'白方落子连成五子', myColor:'white', winBy:'white',
+    snapshot:()=>{ const b=_pgrid(15,15,null); b[7][5]='white'; b[7][6]='white'; b[7][7]='white'; b[7][8]='white'; return { board:b, turn:'white', gameOver:false, winner:null, winLine:null, lastMove:null }; } },
+  { id:'jungle-1', game:'jungle', icon:'🐯', title:'斗兽·狮入兽穴', desc:'红狮踏入对方兽穴即胜', myColor:'red', winBy:'red',
+    snapshot:()=>{ const b=_pgrid(9,7,null); b[1][3]={color:'red',rank:7}; b[8][6]={color:'black',rank:6}; return { board:b, turn:'red', gameOver:false, winner:null, lastMove:null, cntR:1, cntB:1 }; } },
+  { id:'jungle-2', game:'jungle', icon:'🐭', title:'斗兽·鼠窃敌城', desc:'红鼠一步走入对方兽穴', myColor:'red', winBy:'red',
+    snapshot:()=>{ const b=_pgrid(9,7,null); b[0][4]={color:'red',rank:1}; b[8][6]={color:'black',rank:6}; return { board:b, turn:'red', gameOver:false, winner:null, lastMove:null, cntR:1, cntB:1 }; } }
+];
+const PUZZLE_KEY = 'chess_puzzles_solved';
+function _puzzleLoad(){ try{ return JSON.parse(localStorage.getItem(PUZZLE_KEY)||'[]'); }catch(e){ return []; } }
+function isPuzzleSolved(id){ return _puzzleLoad().indexOf(id)>=0; }
+function markPuzzleSolved(id){ try{ const a=_puzzleLoad(); if(a.indexOf(id)<0){ a.push(id); localStorage.setItem(PUZZLE_KEY, JSON.stringify(a)); } }catch(e){} }
+function renderPuzzleList(){
+  const box=$('puzzleList'); if(!box) return; box.innerHTML='';
+  PUZZLES.forEach(p=>{
+    const done=isPuzzleSolved(p.id);
+    const el=document.createElement('div'); el.className='puzzle-item'+(done?' done':'');
+    el.innerHTML='<div class="pi-ic">'+p.icon+'</div><div class="pi-main"><div class="pi-title">'+p.title+'</div><div class="pi-desc">'+p.desc+'</div></div><div class="pi-tag">'+(done?'已解':'挑战')+'</div>';
+    el.addEventListener('click',()=>startPuzzle(p.id));
+    box.appendChild(el);
+  });
+}
+function openPuzzle(){ renderPuzzleList(); const m=$('puzzleModal'); if(m) m.classList.add('show'); }
+function closePuzzle(){ const m=$('puzzleModal'); if(m) m.classList.remove('show'); }
+function startPuzzle(id){
+  const p=PUZZLES.find(x=>x.id===id); if(!p) return;
+  ctrl.puzzle={ id:p.id, game:p.game, myColor:p.myColor, winBy:p.winBy, solved:false, snapshot:p.snapshot(), title:p.title };
+  ctrl.mode='pvp'; ctrl.playerColor[p.game]=p.myColor; ctrl.game=p.game;
+  hideHome(); closePuzzle(); refresh();
+  setHint('🧩 残局「'+p.title+'」：'+p.desc+'（点「悔棋」可重试，点「重新开始」重置本局）');
+}
+function loadPuzzle(){
+  if(!ctrl.puzzle) return;
+  const m=current(); if(!m||!m.net) return;
+  m.net.set(ctrl.puzzle.snapshot);
+  try{ $('undoBtn').disabled=false; }catch(e){}
+  setHint('🧩 残局「'+ctrl.puzzle.title+'」：'+ctrl.puzzle.desc);
+}
+function checkPuzzleWin(){
+  if(!ctrl.puzzle || ctrl.puzzle.solved) return;
+  const m=current(); if(!m||!m.net) return;
+  const s=m.net.get();
+  if(s.gameOver && s.winner===ctrl.puzzle.winBy){
+    ctrl.puzzle.solved=true;
+    markPuzzleSolved(ctrl.puzzle.id);
+    showToast('🎉 解局成功！「'+ctrl.puzzle.title+'」');
+    setHint('🎉 解局成功！点「重新开始」再来一次，或返回主菜单选下一题。已解 '+_puzzleLoad().length+' / '+PUZZLES.length+' 题。');
+  } else if(s.gameOver){
+    showToast('这步让对方赢了，悔棋重试吧');
+  } else {
+    showToast('这一步还没赢，可点「悔棋」重试');
+  }
+}
+tabs.forEach(([id,g])=>$(id).addEventListener('click',()=>{ if(ctrl.online.enabled){ netLeave(); ctrl.mode='ai'; } ctrl.game=g; ctrl.puzzle=null; tabs.forEach(([i])=>$(i).classList.toggle('active', i===id)); setHint(hints[g]); refresh(); }));
 $('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const v=b.dataset.v;
   if(v!=='online' && ctrl.online.enabled) netLeave();
   ctrl.mode=v; $('modeSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
@@ -2947,7 +3312,7 @@ $('ruleFly').addEventListener('change',e=>{ ctrl.aero.rules.fly=e.target.checked
 $('ccPlayersSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; ctrl.checkers.players=+b.dataset.v; ctrl.checkers.aiCount=Math.min(ctrl.checkers.aiCount, ctrl.checkers.players-1); $('ccPlayersSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',+x.dataset.v===ctrl.checkers.players)); $('ccAiSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',+x.dataset.v===ctrl.checkers.aiCount)); syncCheckers(); buildCcTeamPickers(); refresh(); });
 $('ccAiSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; ctrl.checkers.aiCount=Math.min(+b.dataset.v, ctrl.checkers.players-1); $('ccAiSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',+x.dataset.v===ctrl.checkers.aiCount)); syncCheckers(); buildCcTeamPickers(); refresh(); });
 $('ccTeamPickers').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const seat=+b.dataset.seat, col=+b.dataset.v; const other=ctrl.checkers.humanTeams.indexOf(col); if(other!==-1 && other!==seat){ const tmp=ctrl.checkers.humanTeams[seat]; ctrl.checkers.humanTeams[other]=tmp; } ctrl.checkers.humanTeams[seat]=col; buildCcTeamPickers(); refresh(); });
-$('restartBtn').addEventListener('click',()=>{ if(REPLAY.active) exitReplay(); $('log').innerHTML=''; $('undoBtn').disabled=true; game.init(); });
+$('restartBtn').addEventListener('click',()=>{ if(REPLAY.active) exitReplay(); if(ctrl.puzzle){ loadPuzzle(); return; } $('log').innerHTML=''; $('undoBtn').disabled=true; game.init(); });
 $('undoBtn').addEventListener('click',()=>{ if(REPLAY.active){ exitReplay(); return; } if(ctrl.online.enabled){ if(ctrl.online.connected) sendUndoReq(); return; } game.undo(); });
 $('passBtn').addEventListener('click',()=>{ if(ctrl.game==='weiqi' && WG) WG._t.passMove(); });
 $('flipBtn').addEventListener('click',()=>{ ctrl.flipManual=!ctrl.flipManual; $('flipBtn').classList.toggle('on', ctrl.flipManual); setHint(ctrl.flipManual ? '已手动翻转棋盘朝向（再点恢复）' : hints[ctrl.game]); current().render(); });
@@ -2984,8 +3349,11 @@ refresh();
 showHome();
 function showHome(){ $('home').style.display='flex'; }
 function hideHome(){ $('home').style.display='none'; }
-$('home').querySelectorAll('.menu-card').forEach(card=>card.addEventListener('click',()=>{ if(ctrl.online.enabled){ netLeave(); ctrl.mode='ai'; } const g=card.dataset.g; ctrl.game=g; tabs.forEach(([i,gg])=>$(i).classList.toggle('active', gg===g)); setHint(hints[g]); hideHome(); refresh(); }));
-$('homeBtn').addEventListener('click',()=>showHome());
+$('home').querySelectorAll('.menu-card').forEach(card=>card.addEventListener('click',()=>{ if(ctrl.online.enabled){ netLeave(); ctrl.mode='ai'; } const g=card.dataset.g; ctrl.game=g; ctrl.puzzle=null; tabs.forEach(([i,gg])=>$(i).classList.toggle('active', gg===g)); setHint(hints[g]); hideHome(); refresh(); }));
+$('homeBtn').addEventListener('click',()=>{ ctrl.puzzle=null; showHome(); });
+$('puzzleBtn').addEventListener('click', openPuzzle);
+$('puzzleClose').addEventListener('click', closePuzzle);
+$('puzzleModal').addEventListener('click', e=>{ if(e.target===$('puzzleModal')) closePuzzle(); });
 </script>
 </body>
 </html>
