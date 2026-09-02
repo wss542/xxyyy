@@ -1,0 +1,19 @@
+{
+  "name": "棋类游戏合集",
+  "short_name": "棋类合集",
+  "description": "中国象棋、五子棋、国际象棋、飞行棋、跳棋、围棋、黑白棋、斗兽棋、四子棋、暗棋、井字棋，支持人机/双人/联机对战。",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#2b2118",
+  "theme_color": "#2b2118",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
