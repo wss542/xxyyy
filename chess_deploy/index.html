@@ -114,7 +114,7 @@ safe-buffer/index.js:
   /* ===== 联机面板 ===== */
   .onl-box { background:#fff; border-radius:8px; padding:10px; }
   .onl-row { display:flex; gap:8px; margin:6px 0; align-items:center; }
-  .onl-row input { flex:1; min-width:0; padding:8px; border:1px solid #d8c39a; border-radius:7px; font-size:14px; width:100%; color:#2c241b;background:#fff;}
+  .onl-row input { flex:1; min-width:0; padding:8px; border:1px solid #d8c39a; border-radius:7px; font-size:14px; width:100%; color:#2c241b !important;background:#fff !important;-webkit-text-fill-color:#2c241b;}
   .onl-code { font-size:22px; font-weight:800; letter-spacing:4px; color:#c0392b; }
   .onl-status { font-size:13px; color:#7a5a32; min-height:18px; margin:4px 0; line-height:1.5; }
   #netCopy { flex:0 0 auto; padding:8px 14px; margin-bottom:0; }
@@ -187,7 +187,7 @@ safe-buffer/index.js:
   body.dark .menu-card .ds { color:#c9b48f; }
   body.dark .onl-box, body.dark #chatMsgs, body.dark .lobby-item, body.dark .onl-room, body.dark .onl-undo { background:#1c160e; border-color:#4a3a26; }
   body.dark .onl-chat, body.dark .onl-movelog, body.dark .onl-lobby { border-top-color:#4a3a26; }
-body.dark .onl-row input { color:#e8dcc4; background:#2a2218; border-color:#4a3a26; }
+body.dark .onl-row input { color:#e8dcc4; background:#2a2218; border-color:#4a3a26; ;-webkit-text-fill-color:#e8dcc4 !important;}
   body.dark .chat-msgs { background:#1c160e; border-color:#4a3a26; color:#e8dcc4; }
   body.dark .onl-score { background:#33291c; border-color:#4a3a26; color:#e8dcc4; }
   body.dark canvas { background:#3a2e1e; }
@@ -349,7 +349,7 @@ body.dark .onl-row input { color:#e8dcc4; background:#2a2218; border-color:#4a3a
             <button class="btn btn-ghost" id="netJoin" style="margin:0;flex:1" data-page-node-id="uah4nwkJiv1cupjdTxMSGw">加入房间</button>
           </div>
           <div class="onl-row" data-page-node-id="tzza35kChz4RPKOkLUakTe">
-            <input id="netCode" placeholder="输入房间码加入" maxlength="6" style="text-transform:uppercase" data-page-node-id="awjypSNbDFiJivXYqbVcIT">
+            <input id="netCode" placeholder="输入房间码加入" maxlength="6" style="text-transform:uppercase;color:#2c241b;background:#fff;padding:10px 12px;font-size:16px;letter-spacing:3px;font-weight:bold;" data-page-node-id="awjypSNbDFiJivXYqbVcIT">
             <button class="btn btn-ghost" id="netCopy" style="margin:0;flex:0 0 auto;padding:8px 14px" data-page-node-id="Ue6ElugdAC2X77AiSohlIM">复制</button>
           </div>
           <div class="onl-row" data-page-node-id="00WdAQUHzxEsjSDxUdVqDO"><label class="chk" data-page-node-id="IfEytH39QFrTMTJhKBRyVK"><input type="checkbox" id="netSpectate" data-page-node-id="78s9jRobEcRHlbzkxh1B38"> 观战模式（只看不下，需双方选同一棋类）</label></div>
@@ -1092,7 +1092,7 @@ const CH = (function () {
   function select(r,c){ selected=[r,c]; legal=legalMoves(state.turn).filter(m=>m[0]===r&&m[1]===c); render(); }
   function doMove(r,c,tr,tc){ const p=board[r][c]; if(!p) return; const moverColor=p.color;
     const m=legalMoves(state.turn).find(mm=>mm[0]===r&&mm[1]===c&&mm[2]===tr&&mm[3]===tc); if(!m) return;
-    const saved=makeMove(m); const text=moveText(m, saved); history.push({saved, text}); lastMove=[tr,tc]; selected=null; legal=[];
+    const saved=makeMove(m); const text=moveText(m, saved); history.push({saved, text}); lastMove={from:[r,c],to:[tr,tc]}; selected=null; legal=[];
     const opp=state.turn; addLog(text);
     if(legalMoves(opp).length===0){ gameOver=true; winner=moverColor; updateStatus('mate'); render(); netAfterMove(); return; }
     updateStatus(); render(); $('undoBtn').disabled=false; netAfterMove(); maybeAI(); }
@@ -1470,6 +1470,7 @@ const CC = (function () {
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
   return { init, undo, render, isBusy:()=>aiThinking, name:'checkers',
+    cellCenter:(k)=>{ const c=CELLS[cellMap[k]]; return c?{x:cx(c),y:cy(c)}:{x:canvas.width/2,y:canvas.height/2}; },
     _t:{ CELLS, cellMap, HOMES, COLORS, NAME, setupHomes, tgtOf, apexOf,
       legalMovesFor, hasAnyMove, checkFinish, currentIdx, currentColor, isHumanTurn,
       evalFor, pickBest, advanceTurn,
@@ -1976,7 +1977,7 @@ const JG = (function () {
     if (!hit) { selected = null; render(); return; }
     const p = board[hit[0]][hit[1]];
     if (selected) {
-      const m = legal.find(mm => mm.to[0] === hit[0] && mm.to[1] === hit[1]);
+      const m = legal.find(mm => mm.from[0] === selected[0] && mm.from[1] === selected[1] && mm.to[0] === hit[0] && mm.to[1] === hit[1]);
       if (m) { doMove(m); return; }
     }
     if (p && p.color === turn) { selected = hit; render(); return; }
@@ -2108,7 +2109,7 @@ const FO = (function () {
     return cc[0];
   }
   function place(c){
-    if(gameOver||aiThinking) return; if(!netInputAllowed()) return; if(ctrl.mode==='ai'&&turn!==playerSide()) return;
+    if(gameOver||aiThinking) return; if(!netInputAllowed()) return;
     const r=dropRow(c); if(r<0){ setStatus('该列已满'); return; }
     board[r][c]=turn; history.push([r,c]); lastMove=[r,c]; $('undoBtn').disabled=false;
     addLog(turn, '第 '+(c+1)+' 列落子');
@@ -2185,7 +2186,7 @@ const BQ = (function () {
   function isHumanTurn(){ return ctrl.mode!=='ai' || turn===playerSide(); }
   function later(fn,ms){ const g=gen; setTimeout(()=>{ if(g===gen) fn(); }, ms); }
   function maybeAI(){ if(ctrl.mode==='ai'&&!gameOver&&turn===other(playerSide())&&!aiThinking) aiMove(); }
-  function aiMove(){ aiThinking=true; setStatus('AI 思考中…'); later(()=>{ const a=aiPick(); aiThinking=false; if(a){ if(a.type==='flip') flip(a.r,a.c); else doMove(a.from[0],a.from[1],a.to[0],a.to[1]); } }, 160); }
+  function aiMove(){ aiThinking=true; setStatus('AI 思考中…'); later(()=>{ const a=aiPick(); aiThinking=false; if(a){ if(a.type==='flip') flip(a.r,a.c); else doMove(a.from[0],a.from[1],a.to[0],a.to[1]); } else { const flips=allFlips(turn); if(flips.length){ flip(flips[Math.floor(Math.random()*flips.length)].r, flips[Math.floor(Math.random()*flips.length)].c); } else { turn=other(turn); updateStatus(); render(); netAfterMove(); maybeAI(); } } }, 160); }
   function canCapture(at, dt){ if(at==='C') return false; if(at==='P'&&(dt==='C'||dt==='P')) return false; if(at==='G'&&(dt==='C'||dt==='G')) return false; return RANKS[at]>=RANKS[dt]; }
   function genTargets(r,c){
     const p=board[r][c]; if(!p||!p.up) return []; const res=[]; const me=p.side;
@@ -2215,7 +2216,7 @@ const BQ = (function () {
     turn=other(turn); updateStatus(); render(); netAfterMove(); maybeAI();
   }
   function doMove(r,c,tr,tc){
-    if(gameOver||aiThinking) return; if(!netInputAllowed()) return; if(ctrl.mode==='ai'&&turn!==playerSide()) return;
+    if(gameOver||aiThinking) return; if(!netInputAllowed()) return;
     const p=board[r][c]; if(!p||!p.up||p.side!==turn) return;
     const targets=genTargets(r,c); if(!targets.some(x=>x[0]===tr&&x[1]===tc)) return;
     const cap=board[tr][tc];
@@ -2335,7 +2336,7 @@ const TT = (function () {
     return empties.slice().sort((a,b)=>score(b)-score(a))[0];
   }
   function place(r,c){
-    if(gameOver||aiThinking) return; if(!netInputAllowed()) return; if(ctrl.mode==='ai'&&turn!==playerSide()) return;
+    if(gameOver||aiThinking) return; if(!netInputAllowed()) return;
     if(!inB(r,c)||board[r][c]) return;
     board[r][c]=turn; history.push([r,c]); lastMove=[r,c]; $('undoBtn').disabled=false;
     const w=winLine();
@@ -2784,90 +2785,102 @@ function animLastMove(){
   if(typeof requestAnimationFrame!=='function') return;
   const g=ctrl.game, m=current(); if(!m||!m.cellCenter) return;
   const s=m.net.get(); if(!s||!s.lastMove) return;
+  const lm=s.lastMove;
   let fromPos=null, toPos=null;
-  // Determine from/to positions based on game type
-  if(g==='backgammon'){ if(typeof s.lastMove==='number') toPos=m.cellCenter(s.lastMove); }
-  else if(g==='four' || g==='gomoku' || g==='ttt' || g==='reversi' || g==='weiqi'){
-    const lm=s.lastMove; if(Array.isArray(lm)&&lm.length===2) toPos=m.cellCenter(lm[0],lm[1]);
-  }
-  else if(g==='xiangqi' || g==='chess' || g==='jungle' || g==='banqi'){
-    // These games have from/to in lastMove
-    const lm=s.lastMove; 
-    if(lm && lm.from && lm.to){
-      fromPos=(typeof lm.from[0]!=='undefined')?m.cellCenter(lm.from[0],lm.from[1]):null;
-      toPos=m.cellCenter(lm.to[0],lm.to[1]);
-    }
-    else if(Array.isArray(lm)&&lm.length===2){ toPos=m.cellCenter(lm[0],lm[1]); }
+  // 统一解析 lastMove → from/to 像素坐标（兼容多种格式）
+  if(g==='backgammon' && typeof lm==='number'){ toPos=m.cellCenter(lm); }
+  else if(Array.isArray(lm)){
+    if(lm.length===2 && Array.isArray(lm[0])){ fromPos=m.cellCenter(lm[0][0],lm[0][1]); toPos=m.cellCenter(lm[1][0],lm[1][1]); }
+    else if(lm.length===2){ toPos=m.cellCenter(lm[0],lm[1]); }
+  } else if(lm && typeof lm==='object'){
+    const f=lm.from, t=lm.to;
+    if(f==null||t==null) return;
+    if(Array.isArray(f)&&Array.isArray(t)){ fromPos=m.cellCenter(f[0],f[1]); toPos=m.cellCenter(t[0],t[1]); }
+    else if(typeof f==='string'&&typeof t==='string'){ fromPos=m.cellCenter(f); toPos=m.cellCenter(t); }   // 跳棋：cube key
+    else if(typeof f==='number'&&typeof t==='number'){ fromPos=m.cellCenter(f); toPos=m.cellCenter(t); }     // 双陆：点索引
+    else if(Array.isArray(t)){ toPos=m.cellCenter(t[0],t[1]); }
+    else if(typeof lm.r==='number'&&typeof lm.c==='number'){ toPos=m.cellCenter(lm.r,lm.c); }      // 黑白棋 {r,c}
+    else if(t==='off'){ toPos=fromPos; }                                                            // 双陆收子
   }
   if(!toPos) return;
   const cv=$(GAME_CANVAS[g]); if(!cv) return; const xc=cv.getContext('2d');
   if(__animRAF) cancelAnimationFrame(__animRAF);
-  // If we have fromPos, do sliding animation; otherwise just pulse
-  if(fromPos && (Math.abs(fromPos.x-toPos.x)>5 || Math.abs(fromPos.y-toPos.y>5))){
-    animatePieceMove(fromPos, toPos, 180, ()=>{ __animRAF=null; });
+  // 有位移差 → 滑动动画（棋子从起点滑到终点）
+  if(fromPos && (Math.abs(fromPos.x-toPos.x)>3 || Math.abs(fromPos.y-toPos.y)>3)){
+    animatePieceSlide(xc, fromPos, toPos, g, m, 220, ()=>{ __animRAF=null; });
     return;
   }
-  // Fallback: pulse animation at destination
+  // 纯落子 / 翻棋 / 收子 → 缩放弹出动画
   let t0=null; const dur=300;
   function frame(ts){ if(t0===null)t0=ts; const p=Math.min(1,(ts-t0)/dur);
+    const ease=1-Math.pow(1-p,3);
     m.render();
-    xc.save(); xc.globalAlpha=1-p; xc.strokeStyle='#e67e22'; xc.lineWidth=4;
-    xc.beginPath(); xc.arc(toPos.x,toPos.y,24+p*28,0,Math.PI*2); xc.stroke();
-    xc.globalAlpha=1-p*0.5; xc.fillStyle='#e67e22'; xc.beginPath(); xc.arc(toPos.x,toPos.y,20*(1-0.5*p),0,Math.PI*2); xc.fill();
+    xc.save();
+    xc.globalAlpha=(1-p)*0.6;
+    xc.strokeStyle='#e67e22'; xc.lineWidth=3;
+    xc.beginPath(); xc.arc(toPos.x,toPos.y,20+ease*18,0,Math.PI*2); xc.stroke();
+    xc.globalAlpha=0.35+ease*0.5;
+    xc.fillStyle='#e67e22';
+    xc.beginPath(); xc.arc(toPos.x,toPos.y,ease*16,0,Math.PI*2); xc.fill();
     xc.restore();
     if(p<1) __animRAF=requestAnimationFrame(frame); else { m.render(); __animRAF=null; }
   }
   __animRAF=requestAnimationFrame(frame);
 }
-
 let __pieceAnim=null;
-function animatePieceMove(fromPos, toPos, duration, onComplete){
-  if(typeof requestAnimationFrame!=='function'){ if(onComplete) onComplete(); return; }
-  const g=ctrl.game, m=current(); if(!m||!m.cellCenter){ if(onComplete) onComplete(); return; }
-  const cv=$(GAME_CANVAS[g]); if(!cv){ if(onComplete) onComplete(); return; }
-  const xc=cv.getContext('2d');
+function animatePieceSlide(ctx, from, to, game, mod, dur, cb){
   if(__pieceAnim){ cancelAnimationFrame(__pieceAnim.af); __pieceAnim=null; }
-  const t0=null;
-  const anim={af:null, from:fromPos, to:toPos, dur:duration||200, cb:onComplete};
+  let t0=null;
+  const anim={af:null, cb:cb};
   __pieceAnim=anim;
+  // 在动画开始前捕获棋子外观
+  const snapCtx = $(GAME_CANVAS[game]).getContext('2d');
   function frame(ts){
-    if(!__pieceAnim||__pieceAnim!==anim){ if(onComplete) onComplete(); return; }
+    if(!__pieceAnim||__pieceAnim!==anim){ if(cb)cb(); return; }
     if(t0===null)t0=ts;
-    const p=Math.min(1,(ts-t0)/anim.dur);
-    const ease=1-Math.pow(1-p,3);
-    const cx=anim.from.x+(anim.to.x-anim.from.x)*ease;
-    const cy=anim.from.y+(anim.to.y-anim.from.y)*ease;
-    m.render();
-    drawAnimatingPiece(xc, cx, cy, g);
+    const p=Math.min(1,(ts-t0)/dur);
+    const ease=p<0.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2; // easeInOutCubic
+    const cx=from.x+(to.x-from.x)*ease;
+    const cy=from.y+(to.y-from.y)*ease;
+    mod.render();
+    // 在插值位置画棋子（带阴影）
+    drawPieceAt(ctx, cx, cy, game, 1-(p<0.3?0.3*(1-p/0.3):0));
     if(p<1){ anim.af=requestAnimationFrame(frame); }
-    else{ __pieceAnim=null; m.render(); if(anim.cb) anim.cb(); }
+    else{ __pieceAnim=null; mod.render(); if(anim.cb) anim.cb(); }
   }
   anim.af=requestAnimationFrame(frame);
 }
-function drawAnimatingPiece(ctx, x, y, game){
+function drawPieceAt(ctx, x, y, game, shadow){
   ctx.save();
-  ctx.globalAlpha=0.9;
+  if(shadow>0){ ctx.globalAlpha=shadow*0.3; ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(x+2,y+3,20,0,Math.PI*2); ctx.fill(); }
+  ctx.globalAlpha=1;
   const R=20;
-  // Shadow
-  ctx.beginPath(); ctx.arc(x+1.5,y+2,R,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.2)'; ctx.fill();
-  // Piece body
-  ctx.beginPath(); ctx.arc(x,y,R,0,Math.PI*2);
+  // 根据棋种画不同的棋子外观
   if(game==='jungle'||game==='xiangqi'){
-    ctx.fillStyle='#f7e6df'; ctx.fill();
-    ctx.strokeStyle='#c0392b'; ctx.lineWidth=2.5; ctx.stroke();
+    ctx.fillStyle='#f7e6df'; ctx.beginPath(); ctx.arc(x,y,R,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#8B4513'; ctx.lineWidth=2.5; ctx.stroke();
   } else if(game==='chess'){
-    ctx.fillStyle='#fff'; ctx.fill();
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x,y,R,0,Math.PI*2); ctx.fill();
     ctx.strokeStyle='#333'; ctx.lineWidth=2; ctx.stroke();
   } else if(game==='four'){
-    ctx.fillStyle='#c0392b'; ctx.fill();
+    ctx.fillStyle='#c0392b'; ctx.beginPath(); ctx.arc(x,y,R,0,Math.PI*2); ctx.fill();
+  } else if(game==='banqi'){
+    ctx.fillStyle='#f3e6c8'; ctx.fillRect(x-R+2,y-R+2,(R-2)*2,(R-2)*2);
+    ctx.strokeStyle='#8B4513'; ctx.lineWidth=2; ctx.strokeRect(x-R+2,y-R+2,(R-2)*2,(R-2)*2);
   } else if(game==='ttt'){
-    ctx.fillStyle='#fff'; ctx.fill();
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x,y,R,0,Math.PI*2); ctx.fill();
     ctx.strokeStyle='#c0392b'; ctx.lineWidth=3; ctx.stroke();
+  } else if(game==='reversi'){
+    ctx.fillStyle='#333'; ctx.beginPath(); ctx.arc(x,y,R,0,Math.PI*2); ctx.fill();
+  } else if(game==='weiqi'){
+    ctx.fillStyle='#111'; ctx.beginPath(); ctx.arc(x,y,R*0.85,0,Math.PI*2); ctx.fill();
+  } else if(game==='checkers'){
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x,y,R,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#c0392b'; ctx.lineWidth=2.5; ctx.stroke();
   } else {
-    ctx.fillStyle='#fff'; ctx.fill();
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x,y,R,0,Math.PI*2); ctx.fill();
     ctx.strokeStyle='#c0392b'; ctx.lineWidth=2.5; ctx.stroke();
   }
-  ctx.globalAlpha=1;
   ctx.restore();
 }
 
@@ -3360,7 +3373,7 @@ function checkPuzzleWin(){
     showToast('这一步还没赢，可点「悔棋」重试');
   }
 }
-tabs.forEach(([id,g])=>$(id).addEventListener('click',()=>{ if(ctrl.online.enabled){ netLeave(); ctrl.mode='ai'; } ctrl.game=g; ctrl.puzzle=null; tabs.forEach(([i])=>$(i).classList.toggle('active', i===id)); setHint(hints[g]); refresh(); }));
+tabs.forEach(([id,g])=>$(id).addEventListener('click',()=>{ if(ctrl.online.enabled){ netLeave(); } ctrl.mode='ai'; ctrl.game=g; ctrl.puzzle=null; tabs.forEach(([i])=>$(i).classList.toggle('active', i===id)); setHint(hints[g]); refresh(); }));
 $('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const v=b.dataset.v;
   if(v!=='online' && ctrl.online.enabled) netLeave();
   ctrl.mode=v; $('modeSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
@@ -3369,8 +3382,8 @@ $('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); i
     setNetStatus('联机模式（经公共 MQTT 中继，无需自建服务器）：点「创建房间」生成房间码发给对方，或输入对方房间码点「加入房间」。双方需选同一棋类，且都能联网。');
   }
   if(ctrl.game==='checkers'){ syncCheckers(); buildCcTeamPickers(); } refresh(); });
-$('diffSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const v=+b.dataset.v; if(v===ctrl.difficulty){ return; } ctrl.difficulty=v; $('diffSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); if(ctrl.mode!=='online'){ $('log').innerHTML=''; $('undoBtn').disabled=true; game.init(); } });
-$('colorSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; let v=mapColor(ctrl.game,b.dataset.v); ctrl.playerColor[ctrl.game]=v; buildColorSeg(); if(!current().net.get().gameOver){ /* mid-game color change: just re-render */ current().render(); updateStatus(); } else { refresh(); } });
+$('diffSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const v=+b.dataset.v; if(v===ctrl.difficulty){ return; } ctrl.difficulty=v; $('diffSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); if(ctrl.mode!=='online'){ $('log').innerHTML=''; $('undoBtn').disabled=true; } });
+$('colorSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; let v=mapColor(ctrl.game,b.dataset.v); ctrl.playerColor[ctrl.game]=v; buildColorSeg(); if(ctrl.mode==='ai'){ refresh(); } else if(!current().net.get().gameOver){ current().render(); try{updateStatus();}catch(e){} } else { refresh(); } });
 // ===== 飞行棋专属控制 =====
 $('playersSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; ctrl.aero.players=+b.dataset.v; $('playersSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); syncHumanTeams(); buildTeamPickers(); refresh(); });
 $('aiSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; ctrl.aero.aiCount=+b.dataset.v; const seg=$('aiSeg'); seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); syncHumanTeams(); buildTeamPickers(); refresh(); });
@@ -3421,7 +3434,7 @@ refresh();
 showHome();
 function showHome(){ $('home').style.display='flex'; }
 function hideHome(){ $('home').style.display='none'; }
-$('home').querySelectorAll('.menu-card').forEach(card=>card.addEventListener('click',()=>{ if(ctrl.online.enabled){ netLeave(); } ctrl.mode='ai'; const g=card.dataset.g; ctrl.game=g; ctrl.puzzle=null; tabs.forEach(([i,gg])=>$(i).classList.toggle('active', gg===g)); setHint(hints[g]); hideHome(); refresh(); }));
+$('home').querySelectorAll('.menu-card').forEach(card=>card.addEventListener('click',()=>{ if(ctrl.online.enabled){ netLeave(); } ctrl.mode='ai'; const g=card.dataset.g; ctrl.game=g; ctrl.puzzle=null; tabs.forEach(([i,gg])=>$(i).classList.toggle('active', gg===g)); setHint(hints[g]); hideHome(); REPLAY.snaps=[]; REPLAY.active=false; REPLAY.idx=0; const rb=$('replayBar'); if(rb) rb.style.display='none'; refresh(); }));
 $('homeBtn').addEventListener('click',()=>{ ctrl.puzzle=null; showHome(); });
 $('puzzleBtn').addEventListener('click', openPuzzle);
 $('puzzleClose').addEventListener('click', closePuzzle);
