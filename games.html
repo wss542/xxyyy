@@ -141,6 +141,16 @@ safe-buffer/index.js:
   .onl-warn { display:none; background:#fff4e0; border:1px solid #f0c36d; color:#8a5a00; border-radius:8px; padding:10px; font-size:13px; line-height:1.6; margin:6px 0; }
   .onl-warn.show { display:block; }
   .onl-warn b { color:#c0392b; }
+  .onl-score { font-size:13px; color:#5a4326; background:#f3ead6; border:1px solid #e3d3b0; border-radius:6px; padding:6px 8px; margin:4px 0; }
+  .onl-score b { color:#c0392b; }
+  .onl-lobby { margin-top:8px; border-top:1px dashed #e3d3b0; padding-top:8px; }
+  .lobby-list { max-height:160px; overflow-y:auto; }
+  .lobby-item { display:flex; align-items:center; gap:10px; padding:6px 8px; border:1px solid #ecdfc4; border-radius:6px; margin:5px 0; background:#fff; }
+  .lobby-item .lc { font-weight:800; letter-spacing:2px; color:#c0392b; font-size:16px; }
+  .lobby-item .lg { flex:1; font-size:13px; color:#5a4326; }
+  .lobby-empty { font-size:13px; color:#a07a45; padding:8px 4px; }
+  label.chk { display:flex; align-items:center; gap:6px; font-size:13px; color:#5a4326; cursor:pointer; }
+  label.chk input { width:auto; flex:0 0 auto; }
 </style>
 </head>
 <body>
@@ -270,8 +280,11 @@ safe-buffer/index.js:
             <input id="netCode" placeholder="输入房间码加入" maxlength="6" style="text-transform:uppercase">
             <button class="btn btn-ghost" id="netCopy" style="margin:0;flex:0 0 auto;padding:8px 14px">复制</button>
           </div>
+          <div class="onl-row"><label class="chk"><input type="checkbox" id="netSpectate"> 观战模式（只看不下，需双方选同一棋类）</label></div>
           <div class="onl-status" id="netStatus">进入联机后，一方点「创建房间」拿到房间码，另一方输入房间码点「加入房间」。双方需选同一棋类。</div>
+          <div class="onl-score" id="scoreBox">本棋 0胜 / 0负 / 0平</div>
           <div class="onl-row"><button class="btn btn-ghost" id="netLeave" style="margin:0;flex:1">断开连接</button></div>
+          <div class="onl-row"><button class="btn btn-ghost" id="netLobby" style="margin:0;flex:1">浏览在线房间</button></div>
           <div class="onl-chat" id="netChat" style="display:none">
             <div class="chat-title">对局聊天</div>
             <div class="chat-msgs" id="chatMsgs"></div>
@@ -291,6 +304,10 @@ safe-buffer/index.js:
           <div class="onl-movelog" id="netMoveLog" style="display:none">
             <div class="chat-title">棋谱</div>
             <div id="moveLogList"></div>
+          </div>
+          <div class="onl-lobby" id="lobbyPanel" style="display:none">
+            <div class="chat-title">在线房间大厅 <button class="btn btn-ghost" id="lobbyClose" type="button" style="margin:0;flex:0 0 auto;padding:2px 8px">收起</button></div>
+            <div class="lobby-list" id="lobbyList"></div>
           </div>
         </div>
       </div>
@@ -340,7 +357,7 @@ const ctrl = {
     aiCount: 1,                       // AI 玩家数量 0..players-1（其余为人类）
     humanTeams: [0]                   // 人类玩家所选的「家」索引（颜色 = 该家颜色）
   },
-  online: { enabled:false, connected:false, role:null, myColor:null, mySeat:null, room:null, ws:null, server:'', turnStart:0, lastMover:null, moveLog:[], chat:[] },
+  online: { enabled:false, connected:false, role:null, myColor:null, mySeat:null, room:null, ws:null, server:'', turnStart:0, lastMover:null, moveLog:[], chat:[], resultRecorded:false, spectating:false, lobbyTimer:null },
   flipManual: false        // 手动翻转棋盘（网格棋生效）
 };
 // 返回当前模式下「人类所执颜色」：联机=myColor，人机=playerColor，双人=null（由模块用当前走子方判断）
@@ -2098,7 +2115,7 @@ function netInputAllowed(){
   if(!ctrl.online.enabled || !ctrl.online.connected) return false;  // 联机未连上对手：锁盘（避免像双人那样两边都能走）
   return onlineMyTurn();                          // 仅自己的回合可操作
 }
-function netAfterMove(){ if(ctrl.online.enabled && ctrl.online.connected){ const s=current().net.get(); recordMove(s.lastMove!==undefined?s.lastMove:s.lastMoveToken, ctrl.online.myColor, true); sendNet({t:'state', game:ctrl.game, s}); } }
+function netAfterMove(){ if(ctrl.online.enabled && ctrl.online.connected){ const s=current().net.get(); recordMove(s.lastMove!==undefined?s.lastMove:s.lastMoveToken, ctrl.online.myColor, true); if(s.gameOver && !ctrl.online.resultRecorded) recordResult(s.winner, ctrl.online.myColor); sendNet({t:'state', game:ctrl.game, s}); } }
 function sendNet(obj){ if(obj && obj.t==='state') publishState(false); }
 function setNetStatus(t){ const el=$('netStatus'); if(el) el.textContent=t; }
 function setNetConn(state, text){ const c=$('netConn'); if(!c) return; c.className='onl-conn '+(state||''); const t=$('netConnText'); if(t) t.textContent=text; }
@@ -2136,20 +2153,35 @@ function mqttConnect(role, code){
     setNetConn('ok','已连中继·等对手');
     ctrl.online.role=role;   // 先设角色，确保订阅后收到的保留消息能被正确识别为对手状态
     client.subscribe(topic, {qos:1}, (err)=>{ if(err) setNetStatus('订阅失败：'+err.message); });
-    if(role==='host'){
+    if(role==='spectator'){
+      ctrl.online.room=code; ctrl.online.spectating=true; refresh(); showRoomBox(code);
+      setNetStatus('已以观战身份进入房间 '+code+'，正在接收对局画面…（观战模式下你不能落子）');
+    } else if(role==='host'){
       ctrl.online.room=code; applyOnlineSetup('host'); refresh(); showRoomBox(code);
       setNetStatus('房间已创建（'+code+'），等待对手加入…把房间码告诉对方（双方都要用同一最新版 games.html，对方旧版不会 ping，你将一直停在「等对手」）');
-      publishState(true);
+      publishState(true); startLobbyHeartbeat(code);
     } else {
       ctrl.online.room=code; applyOnlineSetup('guest'); refresh(); showRoomBox(code);
       setNetStatus('已加入房间 '+code+'，等待对手状态…');
     }
   });
   client.on('message', (tp, payload)=>{
+    if(tp===LOBBY_TOPIC){
+      let lm; try{ lm=JSON.parse(payload.toString()); }catch(e){ return; }
+      if(lm && lm.t==='lobby'){
+        if(lm.type==='open'){ lobbyRooms[lm.code]={code:lm.code, game:lm.game, name:lm.name, ts:lm.ts||Date.now()}; renderLobby(); }
+        else if(lm.type==='close'){ delete lobbyRooms[lm.code]; renderLobby(); }
+      }
+      return;
+    }
     if(tp!==topic) return;
     let m; try{ m=JSON.parse(payload.toString()); }catch(e){ return; }
     if(m.from===ctrl.online.role) return;
     if(m.t==='state'){
+      if(ctrl.online.spectating){
+        if(m.game===ctrl.game) current().net.set(m.s);
+        return;
+      }
       if(m.game===ctrl.game) current().net.set(m.s);
       const sm=m.s||{};
       recordMove(sm.lastMove!==undefined?sm.lastMove:sm.lastMoveToken, sm.mover!==undefined?sm.mover:sm.turn, false);
@@ -2188,15 +2220,17 @@ function startHost(){
   setNetConn('wait','正在创建房间…'); setNetStatus('正在创建房间 '+code+' …');
   mqttConnect('host', code);
 }
-function startGuest(code){
-  code=(code||'').toUpperCase();
+function startGuest(code, role){
+  code=(code||'').toUpperCase(); role=role||'guest';
   setNetConn('wait','正在加入房间…'); setNetStatus('正在加入房间 '+code+' …');
-  mqttConnect('guest', code);
+  mqttConnect(role, code);
 }
 function netLeave(){
-  stopGuestPing();
-  if(mqClient){ try{ mqClient.end(true); }catch(e){} mqClient=null; }
-  ctrl.online.enabled=false; ctrl.online.connected=false; ctrl.online.role=null; ctrl.online.room=null; ctrl.online.myColor=null; ctrl.online.mySeat=null;
+  stopGuestPing(); stopLobbyHeartbeat();
+  if(ctrl.online.room) publishLobby('close', ctrl.online.room);
+  if(mqClient){ try{ mqClient.unsubscribe(LOBBY_TOPIC); }catch(e){} try{ mqClient.end(true); }catch(e){} mqClient=null; }
+  ctrl.online.enabled=false; ctrl.online.connected=false; ctrl.online.role=null; ctrl.online.room=null; ctrl.online.myColor=null; ctrl.online.mySeat=null; ctrl.online.spectating=false;
+  lobbyRooms={};
   hideRoomBox(); setNetConn('bad','未连接'); setNetStatus('已断开。可重新点「创建房间」或「加入房间」。');
   $('netChat').style.display='none'; $('netMoveLog').style.display='none'; hideUndoReqBar();
   $('chatMsgs').innerHTML=''; $('moveLogList').innerHTML=''; ctrl.online.moveLog=[]; ctrl.online.chat=[]; $('moveTimer').textContent='';
@@ -2265,8 +2299,61 @@ function recordMove(lm, mover, mine){
   const d=document.createElement('div'); d.className='ml';
   d.innerHTML='<span class="n">'+step+'.</span><span class="mc"></span><span class="mv"></span>';
   d.querySelector('.mc').textContent=mc; d.querySelector('.mv').textContent=moveText(lm);
-  list.appendChild(d); list.scrollTop=list.scrollHeight;
+  list.appendChild(d);   list.scrollTop=list.scrollHeight;
   markTurnTimer(mover);
+}
+// ===== 战绩：本地缓存胜负平 =====
+function loadScores(){ try{ return JSON.parse(localStorage.getItem('chess_scores')||'{}'); }catch(e){ return {}; } }
+function saveScore(game, res){
+  const all=loadScores();
+  if(!all[game]) all[game]={win:0,lose:0,draw:0,total:0};
+  all[game][res]=(all[game][res]||0)+1; all[game].total=(all[game].total||0)+1;
+  if(!all.__all__) all.__all__={win:0,lose:0,draw:0,total:0};
+  all.__all__[res]=(all.__all__[res]||0)+1; all.__all__.total=(all.__all__.total||0)+1;
+  try{ localStorage.setItem('chess_scores', JSON.stringify(all)); }catch(e){}
+  updateScoreBox();
+}
+function recordResult(winner, myColor){
+  if(ctrl.online.resultRecorded) return;
+  ctrl.online.resultRecorded=true;
+  let res = (winner===null||winner===undefined||winner==='draw') ? 'draw' : (winner===myColor ? 'win' : 'lose');
+  saveScore(ctrl.game, res);
+}
+function updateScoreBox(){
+  const el=$('scoreBox'); if(!el) return;
+  const all=loadScores(); const g=all[ctrl.game]||{win:0,lose:0,draw:0};
+  const a=all.__all__||{win:0,lose:0,draw:0};
+  el.innerHTML='本棋 <b>'+g.win+'</b>胜 / <b>'+g.lose+'</b>负 / <b>'+g.draw+'</b>平　|　总 <b>'+a.win+'</b>胜 / <b>'+a.lose+'</b>负 / <b>'+a.draw+'</b>平';
+}
+// ===== 房间大厅：全局发现 =====
+const LOBBY_TOPIC='chessrl/lobby/l';
+let lobbyRooms={};
+function publishLobby(type, code){
+  if(!mqClient||!mqClient.connected) return;
+  mqClient.publish(LOBBY_TOPIC, JSON.stringify({t:'lobby', type, code, game:ctrl.game, name:gameName(ctrl.game), ts:Date.now()}), {qos:1, retain:false});
+}
+function startLobbyHeartbeat(code){
+  stopLobbyHeartbeat();
+  ctrl.online.lobbyTimer=setInterval(()=>{ if(ctrl.online.role==='host'&&ctrl.online.room) publishLobby('open', code); }, 5000);
+}
+function stopLobbyHeartbeat(){ if(ctrl.online.lobbyTimer){ clearInterval(ctrl.online.lobbyTimer); ctrl.online.lobbyTimer=null; } }
+function gameName(g){ const t=(hints[g]||g); return t.split('：')[0].slice(0,6); }
+function openLobby(){
+  if(!mqClient||!mqClient.connected){ setNetStatus('请先创建或加入房间后再浏览大厅。'); return; }
+  $('lobbyPanel').style.display='block';
+  mqClient.subscribe(LOBBY_TOPIC, {qos:1});
+  if(ctrl.online.room) publishLobby('open', ctrl.online.room);
+  renderLobby();
+}
+function closeLobby(){ $('lobbyPanel').style.display='none'; if(mqClient&&mqClient.connected) mqClient.unsubscribe(LOBBY_TOPIC); }
+function renderLobby(){
+  const now=Date.now(); lobbyRooms=lobbyRooms||{};
+  const list=$('lobbyList'); if(!list) return;
+  const arr=Object.values(lobbyRooms).filter(r=> now-r.ts<20000 && r.code && r.code!==(ctrl.online.room||''));
+  if(!arr.length){ list.innerHTML='<div class="lobby-empty">暂无其他在线房间。创建房间后稍候，或把房间码发给朋友即可。</div>'; return; }
+  arr.sort((a,b)=>b.ts-a.ts);
+  list.innerHTML=arr.map(r=>'<div class="lobby-item"><span class="lc">'+r.code+'</span><span class="lg">'+(r.name||r.game)+'</span><button class="btn btn-primary lobby-join" data-code="'+r.code+'" type="button" style="margin:0;flex:0 0 auto;padding:4px 12px">加入</button></div>').join('');
+  list.querySelectorAll('.lobby-join').forEach(b=> b.addEventListener('click', ()=>{ const code=b.dataset.code; $('netCode').value=code; startGuest(code); }));
 }
 
 let game = XQ;
@@ -2341,6 +2428,7 @@ function buildCcTeamPickers(){
 }
 function refresh(){
   game=current();
+  ctrl.online.resultRecorded=false; updateScoreBox();
   $('modeSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on', x.dataset.v===ctrl.mode));
   $('boardXQ').classList.toggle('show', ctrl.game==='xiangqi');
   $('boardGO').classList.toggle('show', ctrl.game==='gomoku');
@@ -2420,7 +2508,7 @@ $('undoBtn').addEventListener('click',()=>{ if(ctrl.online.enabled){ if(ctrl.onl
 $('passBtn').addEventListener('click',()=>{ if(ctrl.game==='weiqi' && WG) WG._t.passMove(); });
 $('flipBtn').addEventListener('click',()=>{ ctrl.flipManual=!ctrl.flipManual; $('flipBtn').classList.toggle('on', ctrl.flipManual); setHint(ctrl.flipManual ? '已手动翻转棋盘朝向（再点恢复）' : hints[ctrl.game]); current().render(); });
 $('netCreate').addEventListener('click',()=>{ ctrl.mode='online'; startHost(); });
-$('netJoin').addEventListener('click',()=>{ const code=($('netCode').value||'').trim().toUpperCase(); if(!code){ setNetStatus('请输入房间码'); return; } ctrl.online.room=code; ctrl.mode='online'; startGuest(code); });
+$('netJoin').addEventListener('click',()=>{ const code=($('netCode').value||'').trim().toUpperCase(); if(!code){ setNetStatus('请输入房间码'); return; } const spec=$('netSpectate') && $('netSpectate').checked; ctrl.online.room=code; ctrl.mode='online'; startGuest(code, spec?'spectator':'guest'); });
 $('netCopy').addEventListener('click',()=>{ const code=$('netCode').value; if(navigator.clipboard&&code){ navigator.clipboard.writeText(code).then(()=>setNetStatus('房间码已复制：'+code),()=>setNetStatus('房间码：'+code)); } else { setNetStatus('房间码：'+code); } });
 $('netLeave').addEventListener('click',()=>{ netLeave(); ctrl.mode='ai'; refresh(); });
 // ===== 联机增强：聊天 / 表情 / 悔棋应答 =====
@@ -2429,6 +2517,8 @@ $('chatInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDe
 document.querySelectorAll('.chat-emojis button').forEach(b=> b.addEventListener('click', ()=>{ const i=$('chatInput'); i.value=(i.value||'')+b.dataset.em; i.focus(); }));
 $('undoAccept').addEventListener('click', ()=>{ if(!mqClient||!mqClient.connected||!ctrl.online.room) return; mqClient.publish(mqttTopic(ctrl.online.room,'s'), JSON.stringify({t:'undoAck', from:ctrl.online.role}), {qos:1, retain:false}); hideUndoReqBar(); });
 $('undoDeny').addEventListener('click', ()=>{ if(!mqClient||!mqClient.connected||!ctrl.online.room) return; mqClient.publish(mqttTopic(ctrl.online.room,'s'), JSON.stringify({t:'undoDeny', from:ctrl.online.role}), {qos:1, retain:false}); hideUndoReqBar(); });
+$('netLobby').addEventListener('click', openLobby);
+$('lobbyClose').addEventListener('click', closeLobby);
 
 setHint(hints.xiangqi);
 refresh();
