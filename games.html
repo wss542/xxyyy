@@ -741,7 +741,7 @@ const XQ = (function () {
   function setStatus(t){ $('status').textContent=t; }
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
-  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'xiangqi',
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'xiangqi', maybeAI,
     net: {
       get:()=>({ board, turn, gameOver, lastMove }),
       set:(s)=>{ board=s.board; turn=s.turn; gameOver=s.gameOver; lastMove=s.lastMove||null; selected=null; legal=[]; history=[]; aiThinking=false; render(); updateStatus(turn); }
@@ -934,7 +934,7 @@ const GO = (function () {
   }
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
-  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'gomoku', _t:{ aiPick, wouldWin, candidates },
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'gomoku', maybeAI, _t:{ aiPick, wouldWin, candidates },
     net: {
       get:()=>({ board, turn, gameOver, winner, winLine, lastMove }),
       set:(s)=>{ board=s.board; turn=s.turn; gameOver=s.gameOver; winner=s.winner; winLine=s.winLine; lastMove=s.lastMove; history=[]; aiThinking=false; render(); updateStatus(turn, gameOver?'win':null); }
@@ -1113,7 +1113,7 @@ const CH = (function () {
   function aiMove(){ aiThinking=true; setStatus('AI 思考中…'); setTimeout(()=>{ const m=aiPick(aiSide(), ctrl.difficulty); aiThinking=false; if(m) doMove(m[0],m[1],m[2],m[3]); }, 60); }
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
-  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'chess',
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'chess', maybeAI,
     _t:{ legalMoves, inCheck, aiPick, makeMove, undoMove, board:()=>board, getState:()=>state, setBoard:(bd,st)=>{board=bd; state=st;}, start },
     net: {
       get:()=>({ board, state, gameOver, winner, turn: state.turn, lastMove }),
@@ -1732,7 +1732,7 @@ const RV = (function () {
     log.appendChild(d); log.scrollTop = log.scrollHeight;
   }
 
-  return { init, undo, render, isBusy: () => aiThinking, cellCenter:(r,c)=>({x:gx(c),y:gy(r)}), name: 'reversi',
+  return { init, undo, render, isBusy: () => aiThinking, cellCenter:(r,c)=>({x:gx(c),y:gy(r)}), name: 'reversi', maybeAI,
     _t: { legalMoves, flipsFor, hasMove, count, aiPick, doMove, isHumanTurn,
       getBoard: () => board, setBoard: b => { board = b; }, getTurn: () => turn, setTurn: t => { turn = t; },
       getGameOver: () => gameOver, getWinner: () => winner },
@@ -2058,7 +2058,7 @@ const JG = (function () {
     log.appendChild(d); log.scrollTop = log.scrollHeight;
   }
 
-  return { init, undo, render, isBusy: () => aiThinking, cellCenter:(r,c)=>({x:gx(c),y:gy(r)}), name: 'jungle',
+  return { init, undo, render, isBusy: () => aiThinking, cellCenter:(r,c)=>({x:gx(c),y:gy(r)}), name: 'jungle', maybeAI,
     _t: { genMoves, canCapture, isWater, trapOwner, denAt, aiPick, doMove, isHumanTurn, coord,
       getBoard: () => board, setBoard: b => { board = b; }, getTurn: () => turn, setTurn: t => { turn = t; },
       getLegal: () => legal, refreshLegal, getGameOver: () => gameOver, getWinner: () => winner },
@@ -2152,7 +2152,7 @@ const FO = (function () {
   }
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
-  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'four',
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'four', maybeAI,
     net:{ get:()=>({ board, turn, gameOver, winner, lastMove }),
       set:(s)=>{ board=s.board.map(r=>r.slice()); turn=s.turn; gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove||null; history=[]; aiThinking=false; render(); updateStatus(s.gameOver?'win':''); } } };
 })();
@@ -2302,7 +2302,7 @@ const BQ = (function () {
     if(flips.length){ const f=flips[Math.floor(Math.random()*flips.length)]; return {type:'flip',r:f.r,c:f.c}; }
     return null;
   }
-  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'banqi',
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'banqi', maybeAI,
     net:{ get:()=>({ board: board.map(r=>r.map(p=>p?{side:p.side,type:p.type,up:p.up}:null)), turn, gameOver, winner, lastMove }),
       set:(s)=>{ board=s.board.map(r=>r.map(p=>p?{side:p.side,type:p.type,up:p.up}:null)); turn=s.turn; gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove||null; selected=null; legal=[]; history=[]; aiThinking=false; render(); updateStatus(s.gameOver?'win':''); } } };
 })();
@@ -2364,7 +2364,7 @@ const TT = (function () {
   }
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
-  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'ttt',
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:cx(c),y:cy(r)}), name:'ttt', maybeAI,
     net:{ get:()=>({ board: board.map(r=>r.slice()), turn, gameOver, winner, lastMove }), set:(s)=>{ board=s.board.map(r=>r.slice()); turn=s.turn; gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove||null; history=[]; aiThinking=false; render(); updateStatus(s.gameOver?(s.winner?'win':'draw'):''); } } };
 })();
 
@@ -2600,7 +2600,7 @@ const BG = (function () {
   }
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
-  return { init, undo, render, isBusy:()=>aiThinking, name:'backgammon', cellCenter,
+  return { init, undo, render, isBusy:()=>aiThinking, name:'backgammon', maybeAI, cellCenter,
     net:{ get:()=>({ points:points.map(p=>({n:p.n,c:p.c})), bar:{red:bar.red,black:bar.black}, off:{red:off.red,black:off.black}, turn, dice:dice?dice.slice():null, remaining:remaining.slice(), gameOver, winner, lastMove }),
       set:(s)=>{ points=s.points.map(p=>({n:p.n,c:p.c})); bar={red:s.bar.red,black:s.bar.black}; off={red:s.off.red,black:s.off.black}; turn=s.turn; dice=s.dice?s.dice.slice():null; remaining=(s.remaining||[]).slice(); gameOver=s.gameOver; winner=s.winner; lastMove=s.lastMove||null; history=[]; aiThinking=false; selected=null; legalForSel=[]; phase='move'; render(); updateStatus(s.gameOver?'win':''); } } };
 })();
@@ -2743,7 +2743,7 @@ const WG = (function () {
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('touchstart', e=>{ if(e.touches[0]){ e.preventDefault(); onClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); } }, {passive:false});
   canvas.addEventListener('contextmenu', onContext);
-  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:gx(c),y:gy(r)}), name:'weiqi',
+  return { init, undo, render, isBusy:()=>aiThinking, cellCenter:(r,c)=>({x:gx(c),y:gy(r)}), name:'weiqi', maybeAI,
     _t:{ S, getBoard:()=>board, setBoard:b=>{board=b;}, tryMove, group, neighbors, other,
       getTurn:()=>turn, setTurn:t=>{turn=t;}, doMove, passMove, getGameOver:()=>gameOver, getWinner:()=>winner,
       getCaptures:()=>captures, aiPick, init },
@@ -3197,7 +3197,7 @@ function colorLabel(g,v){
   if(g==='aero') return (AERO_TEAMS.find(t=>t[0]===v)||[v,v])[1];
   return (PIECE_TEAMS[g]||{})[v]||v;
 }
-function mapColor(g,v){ if(g==='aero'||g==='xiangqi'||g==='weiqi'||g==='four'||g==='banqi'||g==='ttt'||g==='backgammon') return v; return v==='red'?'white':'black'; }
+function mapColor(g,v){ if(g==='aero'||g==='xiangqi'||g==='weiqi'||g==='four'||g==='banqi'||g==='ttt'||g==='backgammon'||g==='jungle'||g==='reversi') return v; return v==='red'?'white':'black'; }
 const AERO_TEAMS=[['red','红队'],['yellow','黄队'],['blue','蓝队'],['green','绿队']];
 const AERO_COLORS=AERO_TEAMS.map(t=>t[0]);
 const PIECE_TEAMS={ xiangqi:{red:'执红(先手)',black:'执黑'}, gomoku:{red:'执白',black:'执黑(先手)'}, chess:{red:'执白(先手)',black:'执黑'}, weiqi:{b:'执黑(先手)',w:'执白'}, reversi:{black:'执黑(先手)',white:'执白'}, jungle:{red:'执红(先手)',black:'执黑'}, four:{red:'执红(先手)',yellow:'执黄'}, banqi:{red:'执红(先手)',black:'执黑'}, ttt:{X:'执 X(先手)',O:'执 O'}, backgammon:{red:'执红(先手)',black:'执黑'} };
@@ -3400,7 +3400,7 @@ $('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); i
   }
   if(ctrl.game==='checkers'){ syncCheckers(); buildCcTeamPickers(); } refresh(); });
 $('diffSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const v=+b.dataset.v; if(v===ctrl.difficulty){ return; } ctrl.difficulty=v; $('diffSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); if(ctrl.mode!=='online'){ $('log').innerHTML=''; $('undoBtn').disabled=true; } });
-$('colorSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; let v=mapColor(ctrl.game,b.dataset.v); ctrl.playerColor[ctrl.game]=v; buildColorSeg(); const s=current().net.get(); const started=s.lastMove!==undefined&&s.lastMove!==null; if(s.gameOver || !started){ refresh(); } else { current().render(); try{updateStatus();}catch(e){} } });
+$('colorSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; let v=mapColor(ctrl.game,b.dataset.v); ctrl.playerColor[ctrl.game]=v; buildColorSeg(); const s=current().net.get(); const started=s.lastMove!==undefined&&s.lastMove!==null; if(s.gameOver || !started){ refresh(); } else { current().render(); try{updateStatus();}catch(e){} const m2=current(); if(ctrl.mode==='ai' && typeof m2.maybeAI==='function'){ m2.maybeAI(); } } });
 // ===== 飞行棋专属控制 =====
 $('playersSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; ctrl.aero.players=+b.dataset.v; $('playersSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); syncHumanTeams(); buildTeamPickers(); refresh(); });
 $('aiSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; ctrl.aero.aiCount=+b.dataset.v; const seg=$('aiSeg'); seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); syncHumanTeams(); buildTeamPickers(); refresh(); });
@@ -3420,6 +3420,8 @@ $('passBtn').addEventListener('click',()=>{ if(ctrl.game==='weiqi' && WG) WG._t.
 $('flipBtn').addEventListener('click',()=>{ ctrl.flipManual=!ctrl.flipManual; $('flipBtn').classList.toggle('on', ctrl.flipManual); setHint(ctrl.flipManual ? '已手动翻转棋盘朝向（再点恢复）' : hints[ctrl.game]); current().render(); });
 $('netCreate').addEventListener('click',()=>{ ctrl.mode='online'; startHost(); });
 $('netJoin').addEventListener('click',()=>{ const code=($('netCode').value||'').trim().toUpperCase(); if(!code){ setNetStatus('请输入房间码'); return; } const spec=$('netSpectate') && $('netSpectate').checked; ctrl.online.room=code; ctrl.mode='online'; startGuest(code, spec?'spectator':'guest'); });
+// 手机上软键盘会盖住输入框：聚焦时把输入框滚动到屏幕中央，确保能看到自己输入的内容
+['netCode','netBroker','chatInput'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('focus',()=>{ setTimeout(()=>{ try{ el.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){ try{ el.scrollIntoView(); }catch(_){} } },250); }); });
 $('netCopy').addEventListener('click',()=>{ const code=$('netCode').value; if(navigator.clipboard&&code){ navigator.clipboard.writeText(code).then(()=>setNetStatus('房间码已复制：'+code),()=>setNetStatus('房间码：'+code)); } else { setNetStatus('房间码：'+code); } });
 $('netLeave').addEventListener('click',()=>{ netLeave(); ctrl.mode='ai'; refresh(); });
 // ===== 联机增强：聊天 / 表情 / 悔棋应答 =====
