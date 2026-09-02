@@ -109,6 +109,26 @@ safe-buffer/index.js:
   .onl-status { font-size:13px; color:#7a5a32; min-height:18px; margin:4px 0; line-height:1.5; }
   #netCopy { flex:0 0 auto; padding:8px 14px; margin-bottom:0; }
   #flipBtn.on { background:#e67e22; color:#fff; border-color:#cf6f17; }
+  /* ===== 联机增强：聊天/悔棋/棋谱/计时 ===== */
+  .onl-chat { margin-top:8px; border-top:1px dashed #e3d3b0; padding-top:8px; }
+  .chat-title { font-size:13px; font-weight:700; color:#8a5a2b; margin-bottom:4px; }
+  .chat-msgs { height:120px; overflow-y:auto; background:#faf6ee; border:1px solid #ecdfc4; border-radius:6px; padding:6px; font-size:13px; line-height:1.45; }
+  .chat-msgs .cm { margin:2px 0; }
+  .chat-msgs .cm .nm { font-weight:700; margin-right:4px; }
+  .chat-msgs .cm.mine .nm { color:#c0392b; }
+  .chat-msgs .cm.them .nm { color:#2471a3; }
+  .chat-msgs .sys { color:#a07a45; font-style:italic; }
+  .chat-emojis { display:flex; gap:4px; margin:6px 0; }
+  .chat-emojis button { font-size:18px; padding:2px 6px; border:1px solid #ecdfc4; background:#fff; border-radius:6px; cursor:pointer; }
+  .chat-input-row { display:flex; gap:6px; }
+  .chat-input-row input { flex:1; padding:7px; border:1px solid #d8c39a; border-radius:7px; font-size:14px; min-width:0; }
+  .onl-undo { display:flex; align-items:center; gap:8px; margin-top:8px; background:#fff4e6; border:1px solid #f0c894; border-radius:6px; padding:6px 8px; font-size:13px; }
+  .onl-movelog { margin-top:8px; border-top:1px dashed #e3d3b0; padding-top:8px; }
+  #moveLogList { max-height:140px; overflow-y:auto; font-size:13px; line-height:1.5; }
+  #moveLogList .ml { padding:1px 0; border-bottom:1px solid #f1e8d4; }
+  #moveLogList .ml .n { color:#a07a45; margin-right:6px; }
+  #moveLogList .ml .mc { font-weight:700; margin-right:4px; }
+  .move-timer { margin-left:auto; font-size:13px; color:#7a5a32; font-variant-numeric:tabular-nums; }
   .onl-conn { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; margin:2px 0 6px; }
   .onl-conn .dot { width:9px; height:9px; border-radius:50%; background:#bbb; display:inline-block; }
   .onl-conn.ok .dot { background:#27ae60; }
@@ -133,6 +153,8 @@ safe-buffer/index.js:
       <button class="tab" id="tabFL">飞行棋</button>
       <button class="tab" id="tabCC">跳棋</button>
       <button class="tab" id="tabWG">围棋</button>
+      <button class="tab" id="tabRV">黑白棋</button>
+      <button class="tab" id="tabJG">斗兽棋</button>
     </div>
     <canvas id="boardXQ"></canvas>
     <canvas id="boardGO"></canvas>
@@ -140,6 +162,8 @@ safe-buffer/index.js:
     <canvas id="boardFL"></canvas>
     <canvas id="boardCC"></canvas>
     <canvas id="boardWG"></canvas>
+    <canvas id="boardRV"></canvas>
+    <canvas id="boardJG"></canvas>
   </div>
 
   <div id="panel">
@@ -248,10 +272,30 @@ safe-buffer/index.js:
           </div>
           <div class="onl-status" id="netStatus">进入联机后，一方点「创建房间」拿到房间码，另一方输入房间码点「加入房间」。双方需选同一棋类。</div>
           <div class="onl-row"><button class="btn btn-ghost" id="netLeave" style="margin:0;flex:1">断开连接</button></div>
+          <div class="onl-chat" id="netChat" style="display:none">
+            <div class="chat-title">对局聊天</div>
+            <div class="chat-msgs" id="chatMsgs"></div>
+            <div class="chat-emojis">
+              <button type="button" data-em="👍">👍</button><button type="button" data-em="😄">😄</button><button type="button" data-em="😮">😮</button><button type="button" data-em="😡">😡</button><button type="button" data-em="🎉">🎉</button><button type="button" data-em="🤔">🤔</button>
+            </div>
+            <div class="chat-input-row">
+              <input id="chatInput" placeholder="发消息…" maxlength="120">
+              <button class="btn btn-primary" id="chatSend" type="button" style="margin:0;flex:0 0 auto;padding:6px 12px">发送</button>
+            </div>
+          </div>
+          <div class="onl-undo" id="undoReqBar" style="display:none">
+            <span id="undoReqText">对方请求悔棋</span>
+            <button class="btn btn-primary" id="undoAccept" type="button" style="margin:0;flex:0 0 auto;padding:4px 10px">同意</button>
+            <button class="btn btn-ghost" id="undoDeny" type="button" style="margin:0;flex:0 0 auto;padding:4px 10px">拒绝</button>
+          </div>
+          <div class="onl-movelog" id="netMoveLog" style="display:none">
+            <div class="chat-title">棋谱</div>
+            <div id="moveLogList"></div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="turn-box"><span id="turnDot" class="dot red"></span><span id="turnText">红方走棋</span></div>
+    <div class="turn-box"><span id="turnDot" class="dot red"></span><span id="turnText">红方走棋</span><span id="moveTimer" class="move-timer"></span></div>
     <div id="status" class="status">点击棋子开始对局</div>
     <button class="btn btn-ghost" id="undoBtn">悔棋</button>
     <button class="btn btn-primary" id="restartBtn">重新开始</button>
@@ -273,6 +317,8 @@ safe-buffer/index.js:
       <div class="menu-card" data-g="aero"><div class="ic">🎲</div><div class="nm">飞行棋</div><div class="ds">1~4 人，自选红/黄/蓝/绿队伍，掷骰绕场抵达中心。可开关规则。</div><div class="go">开始 ▶</div></div>
       <div class="menu-card" data-g="checkers"><div class="ic">🔷</div><div class="nm">跳棋（中国跳棋）</div><div class="ds">2~6 人，自选颜色与 AI 数量，连跳移动，把棋子移入对面角。4 档 AI。</div><div class="go">开始 ▶</div></div>
       <div class="menu-card" data-g="weiqi"><div class="ic">⚪</div><div class="nm">围棋</div><div class="ds">9×9 棋盘，提子 / 打劫 / 围空，数子判定胜负（白贴 6.5 目）。人机 / 双人。</div><div class="go">开始 ▶</div></div>
+      <div class="menu-card" data-g="reversi"><div class="ic">⬛</div><div class="nm">黑白棋</div><div class="ds">8×8 棋盘，落子夹击翻转对方一片棋子，终局子多者胜。规则 1 分钟学会，AI 犀利。</div><div class="go">开始 ▶</div></div>
+      <div class="menu-card" data-g="jungle"><div class="ic">🐯</div><div class="nm">斗兽棋</div><div class="ds">鼠象互克、陷阱、兽穴、小河。8 种动物按等级吃子，走进对方兽穴即胜。4 档 AI。</div><div class="go">开始 ▶</div></div>
     </div>
   </div>
 
@@ -282,7 +328,7 @@ const ctrl = {
   game: 'xiangqi',     // 'xiangqi' | 'gomoku' | 'chess' | 'aero' | 'checkers' | 'weiqi'
   mode: 'ai',          // 'ai' | 'pvp'
   difficulty: 2,       // 0..3
-  playerColor: { xiangqi: 'red', gomoku: 'black', chess: 'white', aero: 'red', weiqi: 'b' }, // 玩家执子（围棋用 b/w 与棋盘一致）
+  playerColor: { xiangqi: 'red', gomoku: 'black', chess: 'white', aero: 'red', weiqi: 'b', reversi: 'black', jungle: 'red' }, // 玩家执子（围棋用 b/w 与棋盘一致）
   aero: {
     players: 1,                       // 人类玩家人数 1/2/3/4
     aiCount: 3,                       // AI 队伍数量 0/1/2/3（与人类合计 2~4 队参战）
@@ -294,7 +340,7 @@ const ctrl = {
     aiCount: 1,                       // AI 玩家数量 0..players-1（其余为人类）
     humanTeams: [0]                   // 人类玩家所选的「家」索引（颜色 = 该家颜色）
   },
-  online: { enabled:false, connected:false, role:null, myColor:null, mySeat:null, room:null, ws:null, server:'' },
+  online: { enabled:false, connected:false, role:null, myColor:null, mySeat:null, room:null, ws:null, server:'', turnStart:0, lastMover:null, moveLog:[], chat:[] },
   flipManual: false        // 手动翻转棋盘（网格棋生效）
 };
 // 返回当前模式下「人类所执颜色」：联机=myColor，人机=playerColor，双人=null（由模块用当前走子方判断）
@@ -1303,13 +1349,595 @@ const CC = (function () {
       getGameOver:()=>gameOver, getWinner:()=>winner, getFinished:()=>finishedList, getTurnIdx:()=>turnIdx,
       setTurn:(i)=>{turnIdx=i;}, maybeAI, beginTurn, undo, init },
     net: {
-      get:()=>({ board, turnIdx, active, tgtMap, tgtApexMap, gameOver, winner, finishedList, mover:currentIdx(), lastMove }),
+      get:()=>({ board, turnIdx, turn:currentIdx(), active, tgtMap, tgtApexMap, gameOver, winner, finishedList, mover:currentIdx(), lastMove }),
       set:(s)=>{ board=s.board; turnIdx=s.turnIdx; active=s.active; tgtMap=s.tgtMap; tgtApexMap=s.tgtApexMap; gameOver=s.gameOver; winner=s.winner; finishedList=s.finishedList||[]; lastMove=s.lastMove||null; selected=null; legal=[]; aiThinking=false; render(); updateStatus(); }
     }
   };
 })();
 
 // ====================== 围棋（Weiqi / Go，9×9） ======================
+// ====================== 黑白棋（Reversi / Othello，8×8） ======================
+const RV = (function () {
+  const S = 8, CELL = 54, MARGIN = 30, R = 22;
+  const W = MARGIN * 2 + CELL * S, H = W;
+  const canvas = $('boardRV'); const ctx = canvas.getContext('2d');
+  canvas.width = W; canvas.height = H;
+  const DIRS = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+  // 位置权重：四角价值最高，角旁的 X/C 位为负（易被对手夺角）
+  const WEIGHT = [
+    [ 120, -20,  20,   5,   5,  20, -20, 120],
+    [ -20, -40,  -5,  -5,  -5,  -5, -40, -20],
+    [  20,  -5,  15,   3,   3,  15,  -5,  20],
+    [   5,  -5,   3,   3,   3,   3,  -5,   5],
+    [   5,  -5,   3,   3,   3,   3,  -5,   5],
+    [  20,  -5,  15,   3,   3,  15,  -5,  20],
+    [ -20, -40,  -5,  -5,  -5,  -5, -40, -20],
+    [ 120, -20,  20,   5,   5,  20, -20, 120]
+  ];
+  const COL = 'ABCDEFGH';
+
+  let board, turn, gameOver, winner, lastMove, history, aiThinking, gen;
+  function later(fn, ms) { const g = gen; setTimeout(() => { if (g === gen) fn(); }, ms); }
+  function other(c) { return c === 'black' ? 'white' : 'black'; }
+  function inB(r, c) { return r >= 0 && r < S && c >= 0 && c < S; }
+  function gx(c) { return MARGIN + CELL * c + CELL / 2; }
+  function gy(r) { return MARGIN + CELL * r + CELL / 2; }
+
+  // 返回在 (r,c) 落 color 子会被翻转的所有格子；非法返回 []
+  function flipsFor(r, c, color) {
+    if (!inB(r, c) || board[r][c] !== null) return [];
+    const opp = other(color); const res = [];
+    for (const d of DIRS) {
+      const dr = d[0], dc = d[1];
+      let rr = r + dr, cc = c + dc; const line = [];
+      while (inB(rr, cc) && board[rr][cc] === opp) { line.push([rr, cc]); rr += dr; cc += dc; }
+      if (line.length && inB(rr, cc) && board[rr][cc] === color) for (const p of line) res.push(p);
+    }
+    return res;
+  }
+  function legalMoves(color) {
+    const res = [];
+    for (let r = 0; r < S; r++) for (let c = 0; c < S; c++) if (board[r][c] === null && flipsFor(r, c, color).length) res.push([r, c]);
+    return res;
+  }
+  function hasMove(color) { return legalMoves(color).length > 0; }
+  function count() {
+    let b = 0, w = 0;
+    for (let r = 0; r < S; r++) for (let c = 0; c < S; c++) { if (board[r][c] === 'black') b++; else if (board[r][c] === 'white') w++; }
+    return { black: b, white: w };
+  }
+  function applyMove(r, c, color, flips) { board[r][c] = color; for (const f of flips) board[f[0]][f[1]] = color; }
+  function undoMove(r, c, color, flips) { board[r][c] = null; const opp = other(color); for (const f of flips) board[f[0]][f[1]] = opp; }
+
+  function evalFor(color) {
+    const opp = other(color); let s = 0;
+    for (let r = 0; r < S; r++) for (let c = 0; c < S; c++) {
+      if (board[r][c] === color) s += WEIGHT[r][c];
+      else if (board[r][c] === opp) s -= WEIGHT[r][c];
+    }
+    return s;
+  }
+  function score(me) {
+    return evalFor(me) + 8 * (legalMoves(me).length - legalMoves(other(me)).length);
+  }
+  // negamax 形式的极小化极大 + alpha-beta 剪枝
+  function search(depth, alpha, beta, turnColor, me) {
+    const moves = legalMoves(turnColor);
+    if (moves.length === 0) {
+      if (!hasMove(other(turnColor))) {                 // 双方都无子可下 → 终局，用真实子差
+        const cnt = count();
+        const diff = me === 'black' ? (cnt.black - cnt.white) : (cnt.white - cnt.black);
+        return diff > 0 ? 100000 + diff : (diff < 0 ? -100000 + diff : 0);
+      }
+      if (depth === 0) return score(me);
+      return search(depth - 1, alpha, beta, other(turnColor), me);   // 跳过一手
+    }
+    if (depth === 0) return score(me);
+    if (turnColor === me) {
+      let best = -Infinity;
+      for (const m of moves) {
+        const fl = flipsFor(m[0], m[1], turnColor);
+        applyMove(m[0], m[1], turnColor, fl);
+        const v = search(depth - 1, alpha, beta, other(turnColor), me);
+        undoMove(m[0], m[1], turnColor, fl);
+        if (v > best) best = v;
+        if (best > alpha) alpha = best;
+        if (alpha >= beta) break;
+      }
+      return best;
+    } else {
+      let best = Infinity;
+      for (const m of moves) {
+        const fl = flipsFor(m[0], m[1], turnColor);
+        applyMove(m[0], m[1], turnColor, fl);
+        const v = search(depth - 1, alpha, beta, other(turnColor), me);
+        undoMove(m[0], m[1], turnColor, fl);
+        if (v < best) best = v;
+        if (best < beta) beta = best;
+        if (alpha >= beta) break;
+      }
+      return best;
+    }
+  }
+  function aiPick() {
+    const moves = legalMoves(turn);
+    if (!moves.length) return null;
+    const depth = [0, 1, 3, 4][ctrl.difficulty];
+    if (!depth) return moves[Math.floor(Math.random() * moves.length)];   // 难度0：随机
+    let best = null, bestV = -Infinity;
+    for (const m of moves) {
+      const fl = flipsFor(m[0], m[1], turn);
+      applyMove(m[0], m[1], turn, fl);
+      const v = search(depth - 1, -Infinity, Infinity, other(turn), turn);
+      undoMove(m[0], m[1], turn, fl);
+      if (v > bestV) { bestV = v; best = m; }
+    }
+    return best;
+  }
+
+  function isHumanTurn() { return ctrl.mode !== 'ai' || turn === ctrl.playerColor.reversi; }
+  function pushHistory() { history.push(JSON.stringify({ board, turn, gameOver, winner })); }
+
+  function finishByCount() {
+    gameOver = true;
+    const cnt = count();
+    winner = cnt.black === cnt.white ? null : (cnt.black > cnt.white ? 'black' : 'white');
+  }
+  function doMove(r, c) {
+    const fl = flipsFor(r, c, turn);
+    if (!fl.length) return;
+    const me = turn;
+    pushHistory();
+    applyMove(r, c, me, fl);
+    lastMove = { r, c };
+    addLog(me, '落子 ' + COL[c] + (r + 1) + '，翻转 ' + fl.length + ' 子');
+    const nx = other(me);
+    if (hasMove(nx)) turn = nx;
+    else if (hasMove(me)) addLog(nx, '无子可下，跳过');
+    else finishByCount();
+    updateStatus(); render(); $('undoBtn').disabled = false;
+    netAfterMove();
+    if (!gameOver && !isHumanTurn()) maybeAI();
+  }
+  function maybeAI() {
+    if (gameOver || aiThinking || isHumanTurn()) return;
+    aiThinking = true; setStatus('AI 思考中…'); render();
+    later(() => {
+      aiThinking = false;
+      const mv = aiPick();
+      if (mv) { doMove(mv[0], mv[1]); return; }
+      // AI 无子可下：让给对手；若对手也无子 → 终局
+      const nx = other(turn);
+      if (hasMove(nx)) { turn = nx; addLog(turn, '（对手无子可下）'); }
+      else finishByCount();
+      updateStatus(); render(); netAfterMove();
+    }, 120);
+  }
+
+  function init() {
+    board = Array.from({ length: S }, () => Array(S).fill(null));
+    board[3][3] = 'white'; board[3][4] = 'black'; board[4][3] = 'black'; board[4][4] = 'white';
+    turn = 'black'; gameOver = false; winner = null; lastMove = null; history = []; aiThinking = false; gen = 0;
+    $('undoBtn').disabled = true;
+    updateStatus(); render();
+    if (!isHumanTurn()) maybeAI();
+  }
+  function undo() {
+    if (aiThinking || history.length === 0) return; gen++;
+    const steps = (ctrl.mode === 'ai' && history.length >= 2) ? 2 : 1; let restored = null;
+    for (let i = 0; i < steps; i++) {
+      const h = history.pop(); if (!h) break;
+      restored = JSON.parse(h); board = restored.board; turn = restored.turn; gameOver = restored.gameOver; winner = restored.winner;
+    }
+    if (!restored) return;
+    lastMove = null; updateStatus(); render();
+    $('undoBtn').disabled = history.length === 0;
+  }
+
+  function onClick(e) {
+    if (gameOver || aiThinking) return;
+    if (!netInputAllowed()) return;
+    if (!isHumanTurn()) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (canvas.width / rect.width), y = (e.clientY - rect.top) * (canvas.height / rect.height);
+    const c = Math.floor((x - MARGIN) / CELL), r = Math.floor((y - MARGIN) / CELL);
+    if (!inB(r, c)) return;
+    if (flipsFor(r, c, turn).length) doMove(r, c);
+  }
+  canvas.addEventListener('click', onClick);
+  canvas.addEventListener('touchstart', e => { if (e.touches[0]) { e.preventDefault(); onClick({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY }); } }, { passive: false });
+
+  function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#1f7a4d'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    for (let r = 0; r < S; r++) for (let c = 0; c < S; c++) {
+      const x = MARGIN + c * CELL, y = MARGIN + r * CELL;
+      ctx.fillStyle = ((r + c) % 2 === 0) ? '#248a57' : '#1f7a4d';
+      ctx.fillRect(x, y, CELL, CELL);
+      ctx.strokeStyle = '#0d4a2c'; ctx.lineWidth = 1; ctx.strokeRect(x + 0.5, y + 0.5, CELL - 1, CELL - 1);
+    }
+    ctx.fillStyle = '#0d4a2c';
+    for (const p of [[2, 2], [2, 6], [6, 2], [6, 6]]) { ctx.beginPath(); ctx.arc(gx(p[1]), gy(p[0]), 3, 0, Math.PI * 2); ctx.fill(); }
+    // 合法落子提示：仅轮到自己时显示
+    const myTurn = ctrl.mode === 'online' ? (turn === ctrl.online.myColor) : isHumanTurn();
+    if (!gameOver && myTurn) {
+      for (const m of legalMoves(turn)) {
+        ctx.beginPath(); ctx.arc(gx(m[1]), gy(m[0]), 5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,.45)'; ctx.fill();
+      }
+    }
+    for (let r = 0; r < S; r++) for (let c = 0; c < S; c++) { const v = board[r][c]; if (v) drawDisc(gx(c), gy(r), v); }
+    if (lastMove) {
+      ctx.beginPath(); ctx.arc(gx(lastMove.c), gy(lastMove.r), R + 4, 0, Math.PI * 2);
+      ctx.strokeStyle = '#e67e22'; ctx.lineWidth = 2.5; ctx.stroke();
+    }
+  }
+  function drawDisc(x, y, color) {
+    ctx.beginPath(); ctx.arc(x + 1.5, y + 2, R, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI * 2);
+    ctx.fillStyle = color === 'black' ? '#22252a' : '#f6f4ef'; ctx.fill();
+    ctx.strokeStyle = color === 'black' ? '#000' : '#c9c3b4'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.beginPath(); ctx.arc(x - R * 0.3, y - R * 0.32, R * 0.28, 0, Math.PI * 2);
+    ctx.fillStyle = color === 'black' ? 'rgba(255,255,255,.18)' : 'rgba(255,255,255,.65)'; ctx.fill();
+  }
+  function setStatus(t) { $('status').textContent = t; }
+  function updateStatus() {
+    const dot = $('turnDot'), txt = $('turnText'), st = $('status');
+    const cnt = count();
+    dot.className = 'dot ' + turn;
+    const who = ctrl.mode === 'online' ? (turn === ctrl.online.myColor ? '你' : '对手')
+      : ctrl.mode === 'pvp' ? ('玩家' + (turn === 'black' ? 1 : 2))
+        : (isHumanTurn() ? '你' : 'AI');
+    txt.textContent = (turn === 'black' ? '黑' : '白') + '方 ' + who;
+    if (gameOver) {
+      st.textContent = '🏁 终局：黑 ' + cnt.black + ' : ' + cnt.white + ' 白 — ' + (winner ? ((winner === 'black' ? '黑' : '白') + '方胜') : '平局');
+      return;
+    }
+    st.textContent = '轮到 ' + (turn === 'black' ? '黑' : '白') + '方（' + who + '） ｜ 黑 ' + cnt.black + ' : ' + cnt.white + ' 白';
+  }
+  function addLog(color, t) {
+    const log = $('log'); const d = document.createElement('div');
+    d.innerHTML = '<span style="color:' + (color === 'black' ? '#22252a' : '#8a7a5a') + ';font-weight:700">' + (color === 'black' ? '黑' : '白') + '</span>：' + t;
+    log.appendChild(d); log.scrollTop = log.scrollHeight;
+  }
+
+  return { init, undo, render, isBusy: () => aiThinking, name: 'reversi',
+    _t: { legalMoves, flipsFor, hasMove, count, aiPick, doMove, isHumanTurn,
+      getBoard: () => board, setBoard: b => { board = b; }, getTurn: () => turn, setTurn: t => { turn = t; },
+      getGameOver: () => gameOver, getWinner: () => winner },
+    net: {
+      get: () => ({ board, turn, mover: turn, gameOver, winner, lastMove }),
+      set: (s) => { board = s.board; turn = s.turn; gameOver = s.gameOver; winner = s.winner; lastMove = s.lastMove || null; aiThinking = false; render(); updateStatus(); }
+    }
+  };
+})();
+
+// ====================== 斗兽棋（Jungle，7×9） ======================
+const JG = (function () {
+  const COLS = 7, ROWS = 9, CELL = 56, MARGIN = 30, R = 23;
+  const W = MARGIN * 2 + CELL * (COLS - 1), H = MARGIN * 2 + CELL * (ROWS - 1);
+  const canvas = $('boardJG'); const ctx = canvas.getContext('2d');
+  canvas.width = W; canvas.height = H;
+  const CH = { 8:'象', 7:'狮', 6:'虎', 5:'豹', 4:'狼', 3:'狗', 2:'猫', 1:'鼠' };
+  const VAL = { 1:60, 2:70, 3:80, 4:90, 5:110, 6:130, 7:160, 8:180 };
+  const DEN = { black:[0,3], red:[8,3] };
+  const TRAPS = { black:[[0,2],[0,4],[1,3]], red:[[8,2],[8,4],[7,3]] };
+  const WATER_ROWS = [3,4,5], WATER_COLS = [1,2,4,5];
+  const DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
+  // 初始布局（黑在上，红在下；红先手）
+  const SETUP = [
+    [0,0,'black',6], [0,6,'black',7], [1,1,'black',3], [1,5,'black',2],
+    [2,0,'black',1], [2,2,'black',5], [2,4,'black',4], [2,6,'black',8],
+    [8,0,'red',7], [8,6,'red',6], [7,1,'red',2], [7,5,'red',3],
+    [6,0,'red',8], [6,2,'red',4], [6,4,'red',5], [6,6,'red',1]
+  ];
+
+  let board, turn, selected, legal, gameOver, winner, lastMove, history, aiThinking, gen, cntR, cntB;
+
+  function later(fn, ms) { const g = gen; setTimeout(() => { if (g === gen) fn(); }, ms); }
+  function other(c) { return c === 'red' ? 'black' : 'red'; }
+  function inB(r, c) { return r >= 0 && r < ROWS && c >= 0 && c < COLS; }
+  function isWater(r, c) { return WATER_ROWS.indexOf(r) >= 0 && WATER_COLS.indexOf(c) >= 0; }
+  function denAt(r, c) { if (r === 0 && c === 3) return 'black'; if (r === 8 && c === 3) return 'red'; return null; }
+  function trapOwner(r, c) {
+    for (const k in TRAPS) for (const t of TRAPS[k]) if (t[0] === r && t[1] === c) return k;
+    return null;
+  }
+  function gx(c) { return MARGIN + CELL * c; }
+  function gy(r) { return MARGIN + CELL * r; }
+
+  // 防守方在攻击者陷阱里 → 等级降为 0，可被任何子吃
+  function effRank(def, dr, dc, attackerColor) { return trapOwner(dr, dc) === attackerColor ? 0 : def.rank; }
+  // a 站在 (ar,ac) 吃 d 站在 (dr,dc)
+  function canCapture(a, d, ar, ac, dr, dc) {
+    if (isWater(dr, dc) !== isWater(ar, ac)) return false;      // 水陆之间不能互吃（鼠在水中时）
+    const er = effRank(d, dr, dc, a.color);
+    if (a.rank === 1 && d.rank === 8) return true;              // 鼠吃象
+    if (a.rank === 8 && d.rank === 1) return false;             // 象不能吃鼠
+    return a.rank >= er;
+  }
+
+  function genMoves(color) {
+    const res = [];
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      const p = board[r][c];
+      if (!p || p.color !== color) continue;
+      for (const d of DIRS) {
+        const nr = r + d[0], nc = c + d[1];
+        if (!inB(nr, nc)) continue;
+        if (denAt(nr, nc) === color) continue;                  // 不能进自己兽穴
+        const t = board[nr][nc];
+        if (t && t.color === color) continue;
+        if (isWater(nr, nc) && p.rank !== 1) continue;          // 只有鼠能下水
+        if (t && !canCapture(p, t, r, c, nr, nc)) continue;
+        res.push({ from: [r, c], to: [nr, nc] });
+      }
+      if (p.rank === 7 || p.rank === 6) pushJumps(res, r, c, p, color);   // 狮虎跳河
+    }
+    return res;
+  }
+  function pushJumps(res, r, c, p, color) {
+    const cands = [];
+    if (WATER_ROWS.indexOf(r) >= 0) {
+      if (c === 0) cands.push({ to: [r, 3], path: [[r,1],[r,2]] });
+      else if (c === 3) { cands.push({ to: [r, 0], path: [[r,1],[r,2]] }); cands.push({ to: [r, 6], path: [[r,4],[r,5]] }); }
+      else if (c === 6) cands.push({ to: [r, 3], path: [[r,4],[r,5]] });
+    }
+    if (WATER_COLS.indexOf(c) >= 0) {
+      if (r === 2) cands.push({ to: [6, c], path: [[3,c],[4,c],[5,c]] });
+      else if (r === 6) cands.push({ to: [2, c], path: [[3,c],[4,c],[5,c]] });
+    }
+    for (const cd of cands) {
+      let blocked = false;
+      for (const q of cd.path) { const pc = board[q[0]][q[1]]; if (pc && pc.rank === 1) { blocked = true; break; } }
+      if (blocked) continue;                                     // 河里有鼠，挡住跳跃
+      const t = board[cd.to[0]][cd.to[1]];
+      if (t && t.color === color) continue;
+      if (t && !canCapture(p, t, r, c, cd.to[0], cd.to[1])) continue;
+      res.push({ from: [r, c], to: cd.to, jump: true });
+    }
+  }
+
+  function applyMove(m) {
+    const p = board[m.from[0]][m.from[1]], cap = board[m.to[0]][m.to[1]];
+    board[m.to[0]][m.to[1]] = p; board[m.from[0]][m.from[1]] = null;
+    if (cap) { if (cap.color === 'red') cntR--; else cntB--; }
+    return cap;
+  }
+  function undoMove(m, cap) {
+    const p = board[m.to[0]][m.to[1]];
+    board[m.from[0]][m.from[1]] = p; board[m.to[0]][m.to[1]] = cap;
+    if (cap) { if (cap.color === 'red') cntR++; else cntB++; }
+  }
+
+  function evalFor(me) {
+    const opp = other(me); let s = 0;
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      const p = board[r][c]; if (!p) continue;
+      const v = VAL[p.rank];
+      const ed = DEN[opp];
+      const dist = Math.abs(r - ed[0]) + Math.abs(c - ed[1]);
+      const push = (ROWS + COLS - dist) * 2;                    // 越靠近敌方兽穴越有价值
+      if (p.color === me) {
+        s += v + push;
+        if (trapOwner(r, c) === opp) s -= 45;                   // 我方子踩在敌方陷阱 → 危险
+      } else {
+        s -= v + push;
+        if (trapOwner(r, c) === me) s += 55;                    // 敌方子踩在我方陷阱 → 白送
+      }
+    }
+    return s;
+  }
+  function search(depth, alpha, beta, color, me) {
+    if (cntR === 0 || cntB === 0) {
+      const meWin = (me === 'red' ? cntB === 0 : cntR === 0);
+      return meWin ? 100000 : -100000;
+    }
+    const moves = genMoves(color);
+    if (!moves.length) return color === me ? -100000 : 100000;   // 无子可动判负
+    if (depth === 0) return evalFor(me);
+    if (color === me) {
+      let best = -Infinity;
+      for (const m of moves) {
+        const cap = applyMove(m);
+        const v = denAt(m.to[0], m.to[1]) === other(color) ? 100000 : search(depth - 1, alpha, beta, other(color), me);
+        undoMove(m, cap);
+        if (v > best) best = v;
+        if (best > alpha) alpha = best;
+        if (alpha >= beta) break;
+      }
+      return best;
+    } else {
+      let best = Infinity;
+      for (const m of moves) {
+        const cap = applyMove(m);
+        const v = denAt(m.to[0], m.to[1]) === other(color) ? -100000 : search(depth - 1, alpha, beta, other(color), me);
+        undoMove(m, cap);
+        if (v < best) best = v;
+        if (best < beta) beta = best;
+        if (alpha >= beta) break;
+      }
+      return best;
+    }
+  }
+  function aiPick() {
+    const moves = legal.slice();
+    if (!moves.length) return null;
+    const depth = [0, 1, 2, 3][ctrl.difficulty];
+    if (!depth) return moves[Math.floor(Math.random() * moves.length)];
+    let best = null, bestV = -Infinity;
+    for (const m of moves) {
+      const cap = applyMove(m);
+      const v = denAt(m.to[0], m.to[1]) === other(turn) ? 100000 : search(depth - 1, -Infinity, Infinity, other(turn), turn);
+      undoMove(m, cap);
+      if (v > bestV) { bestV = v; best = m; }
+    }
+    return best;
+  }
+
+  function isHumanTurn() { return ctrl.mode !== 'ai' || turn === ctrl.playerColor.jungle; }
+  function pushHistory() { history.push(JSON.stringify({ board, turn, gameOver, winner, cntR, cntB })); }
+
+  function refreshLegal() { legal = genMoves(turn); }
+  function doMove(m) {
+    if (gameOver) return;
+    pushHistory();
+    const p = board[m.from[0]][m.from[1]];
+    const cap = applyMove(m);
+    lastMove = { from: m.from, to: m.to };
+    addLog(turn, CH[p.rank] + ' ' + coord(m.from) + '→' + coord(m.to) + (cap ? (' 吃 ' + CH[cap.rank]) : ''));
+    if (denAt(m.to[0], m.to[1]) === other(turn)) { gameOver = true; winner = turn; }
+    else if (cntR === 0 || cntB === 0) { gameOver = true; winner = cntR === 0 ? 'black' : 'red'; }
+    else {
+      turn = other(turn); refreshLegal();
+      if (!legal.length) { gameOver = true; winner = other(turn); }   // 对手无子可动 → 对手负
+    }
+    selected = null; legal = gameOver ? [] : legal;
+    updateStatus(); render(); $('undoBtn').disabled = false;
+    netAfterMove();
+    if (!gameOver && !isHumanTurn()) maybeAI();
+  }
+  function maybeAI() {
+    if (gameOver || aiThinking || isHumanTurn()) return;
+    aiThinking = true; setStatus('AI 思考中…'); render();
+    later(() => {
+      aiThinking = false; refreshLegal();
+      const mv = aiPick();
+      if (mv) { doMove(mv); return; }
+      gameOver = true; winner = other(turn); updateStatus(); render(); netAfterMove();
+    }, 130);
+  }
+
+  function init() {
+    board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+    for (const s of SETUP) board[s[0]][s[1]] = { color: s[2], rank: s[3] };
+    turn = 'red'; selected = null; gameOver = false; winner = null; lastMove = null;
+    history = []; aiThinking = false; gen = 0; cntR = 8; cntB = 8;
+    $('undoBtn').disabled = true;
+    refreshLegal(); updateStatus(); render();
+    if (!isHumanTurn()) maybeAI();
+  }
+  function undo() {
+    if (aiThinking || history.length === 0) return; gen++;
+    const steps = (ctrl.mode === 'ai' && history.length >= 2) ? 2 : 1; let restored = null;
+    for (let i = 0; i < steps; i++) {
+      const h = history.pop(); if (!h) break;
+      restored = JSON.parse(h);
+      board = restored.board; turn = restored.turn; gameOver = restored.gameOver; winner = restored.winner;
+      cntR = restored.cntR; cntB = restored.cntB;
+    }
+    if (!restored) return;
+    selected = null; lastMove = null; refreshLegal(); updateStatus(); render();
+    $('undoBtn').disabled = history.length === 0;
+  }
+
+  function coord(p) { return 'ABCDEFG'[p[1]] + (ROWS - p[0]); }
+  function pickAt(x, y) {
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      if (Math.hypot(x - gx(c), y - gy(r)) < CELL * 0.46) return [r, c];
+    }
+    return null;
+  }
+  function onClick(e) {
+    if (gameOver || aiThinking) return;
+    if (!netInputAllowed()) return;
+    if (!isHumanTurn()) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (canvas.width / rect.width), y = (e.clientY - rect.top) * (canvas.height / rect.height);
+    const hit = pickAt(x, y);
+    if (!hit) { selected = null; render(); return; }
+    const p = board[hit[0]][hit[1]];
+    if (selected) {
+      const m = legal.find(mm => mm.to[0] === hit[0] && mm.to[1] === hit[1]);
+      if (m) { doMove(m); return; }
+    }
+    if (p && p.color === turn) { selected = hit; render(); return; }
+    selected = null; render();
+  }
+  canvas.addEventListener('click', onClick);
+  canvas.addEventListener('touchstart', e => { if (e.touches[0]) { e.preventDefault(); onClick({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY }); } }, { passive: false });
+
+  function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fdf3df'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // 河
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      if (isWater(r, c)) {
+        ctx.fillStyle = '#bfe0f5';
+        ctx.fillRect(gx(c) - CELL / 2, gy(r) - CELL / 2, CELL, CELL);
+      }
+    }
+    // 网格
+    ctx.strokeStyle = '#b89b6a'; ctx.lineWidth = 1.2;
+    for (let r = 0; r < ROWS; r++) { ctx.beginPath(); ctx.moveTo(gx(0), gy(r)); ctx.lineTo(gx(COLS - 1), gy(r)); ctx.stroke(); }
+    for (let c = 0; c < COLS; c++) { ctx.beginPath(); ctx.moveTo(gx(c), gy(0)); ctx.lineTo(gx(c), gy(ROWS - 1)); ctx.stroke(); }
+    // 兽穴 + 陷阱
+    for (const k in DEN) {
+      const d = DEN[k];
+      ctx.fillStyle = k === 'red' ? 'rgba(192,57,43,.18)' : 'rgba(44,62,80,.18)';
+      ctx.fillRect(gx(d[1]) - CELL / 2, gy(d[0]) - CELL / 2, CELL, CELL);
+      ctx.fillStyle = k === 'red' ? '#c0392b' : '#2c3e50';
+      ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('穴', gx(d[1]), gy(d[0]));
+    }
+    for (const k in TRAPS) for (const t of TRAPS[k]) {
+      ctx.strokeStyle = k === 'red' ? '#c0392b' : '#2c3e50'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(gx(t[1]), gy(t[0]), CELL * 0.34, 0, Math.PI * 2); ctx.stroke();
+    }
+    // 上一步
+    if (lastMove) {
+      ctx.strokeStyle = '#e67e22'; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(gx(lastMove.from[1]), gy(lastMove.from[0])); ctx.lineTo(gx(lastMove.to[1]), gy(lastMove.to[0])); ctx.stroke();
+    }
+    // 合法落点提示
+    if (!gameOver && selected) {
+      for (const m of legal) {
+        if (m.from[0] !== selected[0] || m.from[1] !== selected[1]) continue;
+        ctx.beginPath(); ctx.arc(gx(m.to[1]), gy(m.to[0]), 6, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(31,138,76,.75)'; ctx.fill();
+      }
+    }
+    // 棋子
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) { const p = board[r][c]; if (p) drawPiece(gx(c), gy(r), p, selected && selected[0] === r && selected[1] === c); }
+  }
+  function drawPiece(x, y, p, isSel) {
+    const red = p.color === 'red';
+    ctx.beginPath(); ctx.arc(x + 1.5, y + 2, R, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,.2)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI * 2);
+    ctx.fillStyle = red ? '#f7e6df' : '#faf3e6'; ctx.fill();
+    ctx.strokeStyle = red ? '#c0392b' : '#2c3e50'; ctx.lineWidth = isSel ? 3.5 : 2; ctx.stroke();
+    ctx.fillStyle = red ? '#c0392b' : '#2c3e50';
+    ctx.font = 'bold 19px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(CH[p.rank], x, y + 1);
+  }
+  function setStatus(t) { $('status').textContent = t; }
+  function updateStatus() {
+    const dot = $('turnDot'), txt = $('turnText'), st = $('status');
+    dot.className = 'dot ' + turn;
+    const who = ctrl.mode === 'online' ? (turn === ctrl.online.myColor ? '你' : '对手')
+      : ctrl.mode === 'pvp' ? ('玩家' + (turn === 'red' ? 1 : 2))
+        : (isHumanTurn() ? '你' : 'AI');
+    txt.textContent = (turn === 'red' ? '红' : '黑') + '方 ' + who;
+    if (gameOver) { st.textContent = '🏁 ' + (winner === 'red' ? '红方' : '黑方') + '胜！（红剩 ' + cntR + '，黑剩 ' + cntB + '）'; return; }
+    st.textContent = '轮到 ' + (turn === 'red' ? '红' : '黑') + '方（' + who + '） ｜ 红剩 ' + cntR + '，黑剩 ' + cntB;
+  }
+  function addLog(color, t) {
+    const log = $('log'); const d = document.createElement('div');
+    d.innerHTML = '<span style="color:' + (color === 'red' ? '#c0392b' : '#2c3e50') + ';font-weight:700">' + (color === 'red' ? '红' : '黑') + '</span>：' + t;
+    log.appendChild(d); log.scrollTop = log.scrollHeight;
+  }
+
+  return { init, undo, render, isBusy: () => aiThinking, name: 'jungle',
+    _t: { genMoves, canCapture, isWater, trapOwner, denAt, aiPick, doMove, isHumanTurn, coord,
+      getBoard: () => board, setBoard: b => { board = b; }, getTurn: () => turn, setTurn: t => { turn = t; },
+      getLegal: () => legal, refreshLegal, getGameOver: () => gameOver, getWinner: () => winner },
+    net: {
+      get: () => ({ board, turn, mover: turn, gameOver, winner, lastMove, cntR, cntB }),
+      set: (s) => { board = s.board; turn = s.turn; gameOver = s.gameOver; winner = s.winner; lastMove = s.lastMove || null; cntR = s.cntR; cntB = s.cntB; selected = null; aiThinking = false; refreshLegal(); render(); updateStatus(); }
+    }
+  };
+})();
+
 const WG = (function () {
   const S = 9, CELL = 56, MARGIN = 30, R = 22;
   const W = MARGIN*2 + CELL*(S-1), H = W;
@@ -1470,7 +2098,7 @@ function netInputAllowed(){
   if(!ctrl.online.enabled || !ctrl.online.connected) return false;  // 联机未连上对手：锁盘（避免像双人那样两边都能走）
   return onlineMyTurn();                          // 仅自己的回合可操作
 }
-function netAfterMove(){ if(ctrl.online.enabled && ctrl.online.connected) sendNet({t:'state', game:ctrl.game, s: current().net.get()}); }
+function netAfterMove(){ if(ctrl.online.enabled && ctrl.online.connected){ const s=current().net.get(); recordMove(s.lastMove!==undefined?s.lastMove:s.lastMoveToken, ctrl.online.myColor, true); sendNet({t:'state', game:ctrl.game, s}); } }
 function sendNet(obj){ if(obj && obj.t==='state') publishState(false); }
 function setNetStatus(t){ const el=$('netStatus'); if(el) el.textContent=t; }
 function setNetConn(state, text){ const c=$('netConn'); if(!c) return; c.className='onl-conn '+(state||''); const t=$('netConnText'); if(t) t.textContent=text; }
@@ -1485,6 +2113,8 @@ function applyOnlineSetup(role){
   else if(g==='gomoku'){ const mc = role==='host'?'black':'white'; ctrl.playerColor.gomoku=mc; ctrl.online.myColor=mc; }
   else if(g==='chess'){ const mc = role==='host'?'white':'black'; ctrl.playerColor.chess=mc; ctrl.online.myColor=mc; }
   else if(g==='weiqi'){ const mc = role==='host'?'b':'w'; ctrl.playerColor.weiqi=mc; ctrl.online.myColor=mc; }
+  else if(g==='reversi'){ const mc = role==='host'?'black':'white'; ctrl.playerColor.reversi=mc; ctrl.online.myColor=mc; }
+  else if(g==='jungle'){ const mc = role==='host'?'red':'black'; ctrl.playerColor.jungle=mc; ctrl.online.myColor=mc; }
   else if(g==='aero'){ ctrl.aero.players=2; ctrl.aero.aiCount=0; const me=role==='host'?'red':'yellow', op=role==='host'?'yellow':'red'; ctrl.aero.humanTeams=[me,op]; ctrl.online.myColor=me; }
   else if(g==='checkers'){ ctrl.checkers.players=2; ctrl.checkers.aiCount=0; ctrl.checkers.humanTeams=[0,3]; ctrl.online.myColor = role==='host'?0:3; ctrl.online.mySeat = role==='host'?0:1; }
 }
@@ -1521,14 +2151,21 @@ function mqttConnect(role, code){
     if(m.from===ctrl.online.role) return;
     if(m.t==='state'){
       if(m.game===ctrl.game) current().net.set(m.s);
+      const sm=m.s||{};
+      recordMove(sm.lastMove!==undefined?sm.lastMove:sm.lastMoveToken, sm.mover!==undefined?sm.mover:sm.turn, false);
       if(!ctrl.online.connected){
         ctrl.online.connected=true; setNetConn('ok','已连接');
+        $('netChat').style.display='block'; $('netMoveLog').style.display='block'; startMoveTimer();
         setNetStatus(ctrl.online.role==='host'?'对手已加入！轮到你时直接落子即可。':'已加入房间 '+code+'，对局开始！');
         if(ctrl.online.role==='guest') startGuestPing(); // 反复 ping 主机（QoS1+重试），确保主机也显示「已连接」
         else publishAck(); // 主机收到客机首条状态 → 回 ack，让客机停止 ping
       }
     } else if(m.t==='ack'){ stopGuestPing(); } // 客机收到主机 ack → 停止 ping
     else if(m.t==='leave'){ ctrl.online.connected=false; hideRoomBox(); setNetConn('bad','对手已离开'); setNetStatus('对手已离开，连接断开。可点「创建房间」重开。'); }
+    else if(m.t==='chat'){ appendChat(m.name||(m.from==='host'?'对手':'对手'), m.text, false); }
+    else if(m.t==='undoReq'){ showUndoReqBar(); }
+    else if(m.t==='undoAck'){ hideUndoReqBar(); doUndoBoth(); }
+    else if(m.t==='undoDeny'){ hideUndoReqBar(); appendChat('系统', '对方拒绝了悔棋请求', true, true); }
   });
   client.on('error', (e)=>{ setNetConn('bad','连接出错'); setNetStatus('中继错误：'+(e&&e.message||e)+'。可刷新重试，或在「信令地址」换成可达的 broker。'); });
   client.on('close', ()=>{ if(ctrl.online.connected){ ctrl.online.connected=false; setNetConn('bad','已断开'); setNetStatus('与中继断开，可刷新重连。'); } });
@@ -1561,6 +2198,75 @@ function netLeave(){
   if(mqClient){ try{ mqClient.end(true); }catch(e){} mqClient=null; }
   ctrl.online.enabled=false; ctrl.online.connected=false; ctrl.online.role=null; ctrl.online.room=null; ctrl.online.myColor=null; ctrl.online.mySeat=null;
   hideRoomBox(); setNetConn('bad','未连接'); setNetStatus('已断开。可重新点「创建房间」或「加入房间」。');
+  $('netChat').style.display='none'; $('netMoveLog').style.display='none'; hideUndoReqBar();
+  $('chatMsgs').innerHTML=''; $('moveLogList').innerHTML=''; ctrl.online.moveLog=[]; ctrl.online.chat=[]; $('moveTimer').textContent='';
+}
+// ===== 联机增强：聊天 =====
+function nameFor(role){ if(role===ctrl.online.role) return '我'; return (ctrl.online.myColor && role==='host') ? '对手' : '对手'; }
+function appendChat(name, text, mine, sys){
+  const box=$('chatMsgs'); if(!box) return;
+  const d=document.createElement('div'); d.className='cm '+(sys?'sys':(mine?'mine':'them'));
+  if(!sys) d.innerHTML='<span class="nm"></span><span class="tx"></span>';
+  if(sys){ d.textContent=text; }
+  else { d.querySelector('.nm').textContent=name+':'; d.querySelector('.tx').textContent=text; }
+  box.appendChild(d); box.scrollTop=box.scrollHeight;
+}
+function sendChat(){
+  const inp=$('chatInput'); const t=(inp.value||'').trim(); if(!t) return;
+  if(!mqClient || !mqClient.connected || !ctrl.online.room) return;
+  mqClient.publish(mqttTopic(ctrl.online.room,'s'), JSON.stringify({t:'chat', from:ctrl.online.role, name:'我', text:t}), {qos:1, retain:false});
+  appendChat('我', t, true); inp.value='';
+}
+// ===== 联机增强：悔棋请求 =====
+function sendUndoReq(){
+  if(!mqClient || !mqClient.connected || !ctrl.online.room) return;
+  if(!current().undo) { appendChat('系统','当前棋类不支持悔棋',true,true); return; }
+  mqClient.publish(mqttTopic(ctrl.online.room,'s'), JSON.stringify({t:'undoReq', from:ctrl.online.role}), {qos:1, retain:false});
+  appendChat('系统','已发送悔棋请求，等待对方同意…',true,true);
+}
+function showUndoReqBar(){ const b=$('undoReqBar'); if(b) b.style.display='flex'; }
+function hideUndoReqBar(){ const b=$('undoReqBar'); if(b) b.style.display='none'; }
+function doUndoBoth(){
+  try{ current().undo(); }catch(e){}
+  hideUndoReqBar();
+  if(ctrl.online.enabled && ctrl.online.connected) publishState(false);
+  appendChat('系统','已悔棋一步',true,true);
+}
+// ===== 联机增强：每步计时 =====
+function markTurnTimer(mover){
+  if(mover===ctrl.online.lastMover) return;
+  ctrl.online.lastMover=mover; ctrl.online.turnStart=Date.now();
+}
+function startMoveTimer(){
+  if(ctrl.online._timer) return;
+  ctrl.online._timer=setInterval(()=>{
+    if(!ctrl.online.enabled || !ctrl.online.connected){ $('moveTimer').textContent=''; return; }
+    const el=$('moveTimer'); if(!el) return;
+    const ms=Date.now()-ctrl.online.turnStart; const s=Math.floor(ms/1000);
+    const mm=String(Math.floor(s/60)).padStart(1,'0'); const ss=String(s%60).padStart(2,'0');
+    el.textContent='⏱ '+mm+':'+ss;
+  }, 500);
+}
+// ===== 联机增强：棋谱记录 =====
+function moveText(lm){
+  if(!lm) return '';
+  if(Array.isArray(lm)) return '('+lm.join(',')+')';
+  if(lm.from && lm.to) return '('+lm.from.join(',')+'→'+lm.to.join()+')';
+  if(lm.r!==undefined && lm.c!==undefined) return '('+lm.r+','+lm.c+')';
+  if(lm.color!==undefined && lm.ti!==undefined) return '('+lm.color+'#'+(+lm.ti)+')';
+  try{ return '('+JSON.stringify(lm)+')'; }catch(e){ return ''; }
+}
+function recordMove(lm, mover, mine){
+  if(lm===undefined || lm===null) return; // 开局初始 publish 等无着法时不记
+  const list=$('moveLogList'); if(!list) return;
+  const step=ctrl.online.moveLog.length+1;
+  const mc = mover!==undefined ? colorLabel(ctrl.game, mover) : (mine?'我':'对手');
+  ctrl.online.moveLog.push({step, mc, lm});
+  const d=document.createElement('div'); d.className='ml';
+  d.innerHTML='<span class="n">'+step+'.</span><span class="mc"></span><span class="mv"></span>';
+  d.querySelector('.mc').textContent=mc; d.querySelector('.mv').textContent=moveText(lm);
+  list.appendChild(d); list.scrollTop=list.scrollHeight;
+  markTurnTimer(mover);
 }
 
 let game = XQ;
@@ -1571,7 +2277,7 @@ function colorLabel(g,v){
 function mapColor(g,v){ if(g==='aero'||g==='xiangqi'||g==='weiqi') return v; return v==='red'?'white':'black'; }
 const AERO_TEAMS=[['red','红队'],['yellow','黄队'],['blue','蓝队'],['green','绿队']];
 const AERO_COLORS=AERO_TEAMS.map(t=>t[0]);
-const PIECE_TEAMS={ xiangqi:{red:'执红(先手)',black:'执黑'}, gomoku:{red:'执白',black:'执黑(先手)'}, chess:{red:'执白(先手)',black:'执黑'}, weiqi:{black:'执黑(先手)',white:'执白'} };
+const PIECE_TEAMS={ xiangqi:{red:'执红(先手)',black:'执黑'}, gomoku:{red:'执白',black:'执黑(先手)'}, chess:{red:'执白(先手)',black:'执黑'}, weiqi:{b:'执黑(先手)',w:'执白'}, reversi:{black:'执黑(先手)',white:'执白'}, jungle:{red:'执红(先手)',black:'执黑'} };
 function buildColorSeg(){
   const seg=$('colorSeg'); const g=ctrl.game;
   const defs = g==='aero' ? AERO_TEAMS : Object.entries(PIECE_TEAMS[g]||{red:'红',black:'黑'});
@@ -1583,7 +2289,7 @@ function buildColorSeg(){
   for(const [v] of defs){ if(mapColor(g,v)===ctrl.playerColor[g]){ activeV=v; break; } }
   seg.querySelectorAll('button').forEach(b=> b.classList.toggle('on', b.dataset.v===activeV));
 }
-function current(){ return ctrl.game==='xiangqi'?XQ : ctrl.game==='gomoku'?GO : ctrl.game==='chess'?CH : ctrl.game==='aero'?FL : ctrl.game==='checkers'?CC : WG; }
+function current(){ return ctrl.game==='xiangqi'?XQ : ctrl.game==='gomoku'?GO : ctrl.game==='chess'?CH : ctrl.game==='aero'?FL : ctrl.game==='checkers'?CC : ctrl.game==='reversi'?RV : ctrl.game==='jungle'?JG : WG; }
 function clampAero(){
   let ai = ctrl.aero.aiCount;
   ai = Math.max(0, Math.min(ai, 4 - ctrl.aero.players));   // 合计不超过 4 队
@@ -1642,6 +2348,8 @@ function refresh(){
   $('boardFL').classList.toggle('show', ctrl.game==='aero');
   $('boardCC').classList.toggle('show', ctrl.game==='checkers');
   $('boardWG').classList.toggle('show', ctrl.game==='weiqi');
+  $('boardRV').classList.toggle('show', ctrl.game==='reversi');
+  $('boardJG').classList.toggle('show', ctrl.game==='jungle');
   const isAero = ctrl.game==='aero';
   const isCheckers = ctrl.game==='checkers';
   const isWeiqi = ctrl.game==='weiqi';
@@ -1653,7 +2361,7 @@ function refresh(){
   $('checkersPanel').style.display = isCheckers ? '' : 'none';
   $('onlinePanel').style.display = isOnline ? 'block' : 'none';
   $('passBtn').style.display = isWeiqi ? '' : 'none';
-  $('flipBtn').style.display = (isAero||isCheckers) ? 'none' : '';
+  $('flipBtn').style.display = (isAero||isCheckers||ctrl.game==='reversi'||ctrl.game==='jungle') ? 'none' : '';
   if(isOnline){ setNetStatus('联机模式：创建或加入房间后开始对局。'); }
   else if(isAero){
     $('playersSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on', +x.dataset.v===ctrl.aero.players));
@@ -1672,7 +2380,7 @@ function refresh(){
   $('log').innerHTML=''; $('undoBtn').disabled=true;
   game.init();
 }
-const tabs=[['tabXQ','xiangqi'],['tabGO','gomoku'],['tabCH','chess'],['tabFL','aero'],['tabCC','checkers'],['tabWG','weiqi']];
+const tabs=[['tabXQ','xiangqi'],['tabGO','gomoku'],['tabCH','chess'],['tabFL','aero'],['tabCC','checkers'],['tabWG','weiqi'],['tabRV','reversi'],['tabJG','jungle']];
 const hints={
   xiangqi:'象棋：红先黑后。点击己方棋子选中，再点高亮处落子。含车马炮将士象规则、将军/将死判定。',
   gomoku:'五子棋：黑先白后，先连成五子者胜（含禁手）。人机模式下你执选定颜色，AI 自动应对。',
@@ -1680,6 +2388,8 @@ const hints={
   aero:'飞行棋：先选「玩家人数」与「AI 数量」（合计 2~4 队参战），每人可独立选红/黄/蓝/绿队伍。掷出 6 才能起飞，绕场一圈从本色通道抵达中心，4 架全到中心即完成。当有 3 队到达终点时游戏结束并按到达顺序排名。轮到你时点棋盘掷骰子，再点棋子移动；掷 6 可再掷一次。'
   , checkers:'跳棋（中国跳棋）：先选「玩家人数」2~6 人，再选「AI 数量」（其余为玩家），并可自选每位玩家的颜色（出发角）。点己方棋子选中，绿点为可落子格；可走相邻空位一步，或沿直线连续跳过棋子（连跳，可中途停下）。把全部 10 颗棋子移入对面角即完成；当有（人数−1）队完成时游戏结束，按到达顺序排名。AI 难度由左侧「AI 难度」统一设置。'
   , weiqi:'围棋：9×9 棋盘。左键落子，右键虚手(Pass)。规则含提子（无气即提）、打劫（不可立即提回）、数子判定胜负（白贴 6.5 目）。人机/双人，4 档 AI。把棋子围空最多者胜。'
+  , reversi:'黑白棋（Reversi）：黑先白后。落子必须夹住对方至少一枚棋子（横/竖/斜任一方向），被夹住的棋子全部翻成你的颜色。无子可下则自动跳过，双方都无子可下时子多者胜。四角是战略要地——占住就不会再被翻。'
+  , jungle:'斗兽棋：红先黑后。8 种动物按 象>狮>虎>豹>狼>狗>猫>鼠 的等级吃同级或低级子；鼠能吃象，但象不能吃鼠。己方棋子走进对方兽穴即胜。陷阱：进入对方陷阱的棋子等级降为 0，可被任何敌子吃。河：只有鼠能下水；狮虎可跳河（横/竖跨过整条河，途中无鼠则通过）。'
 };
 tabs.forEach(([id,g])=>$(id).addEventListener('click',()=>{ if(ctrl.online.enabled){ netLeave(); ctrl.mode='ai'; } ctrl.game=g; tabs.forEach(([i])=>$(i).classList.toggle('active', i===id)); setHint(hints[g]); refresh(); }));
 $('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const v=b.dataset.v;
@@ -1706,13 +2416,19 @@ $('ccPlayersSeg').addEventListener('click',e=>{ const b=e.target.closest('button
 $('ccAiSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; ctrl.checkers.aiCount=Math.min(+b.dataset.v, ctrl.checkers.players-1); $('ccAiSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',+x.dataset.v===ctrl.checkers.aiCount)); syncCheckers(); buildCcTeamPickers(); refresh(); });
 $('ccTeamPickers').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const seat=+b.dataset.seat, col=+b.dataset.v; const other=ctrl.checkers.humanTeams.indexOf(col); if(other!==-1 && other!==seat){ const tmp=ctrl.checkers.humanTeams[seat]; ctrl.checkers.humanTeams[other]=tmp; } ctrl.checkers.humanTeams[seat]=col; buildCcTeamPickers(); refresh(); });
 $('restartBtn').addEventListener('click',()=>{ $('log').innerHTML=''; $('undoBtn').disabled=true; game.init(); });
-$('undoBtn').addEventListener('click',()=>{ if(ctrl.online.enabled) return; game.undo(); });
+$('undoBtn').addEventListener('click',()=>{ if(ctrl.online.enabled){ if(ctrl.online.connected) sendUndoReq(); return; } game.undo(); });
 $('passBtn').addEventListener('click',()=>{ if(ctrl.game==='weiqi' && WG) WG._t.passMove(); });
 $('flipBtn').addEventListener('click',()=>{ ctrl.flipManual=!ctrl.flipManual; $('flipBtn').classList.toggle('on', ctrl.flipManual); setHint(ctrl.flipManual ? '已手动翻转棋盘朝向（再点恢复）' : hints[ctrl.game]); current().render(); });
 $('netCreate').addEventListener('click',()=>{ ctrl.mode='online'; startHost(); });
 $('netJoin').addEventListener('click',()=>{ const code=($('netCode').value||'').trim().toUpperCase(); if(!code){ setNetStatus('请输入房间码'); return; } ctrl.online.room=code; ctrl.mode='online'; startGuest(code); });
 $('netCopy').addEventListener('click',()=>{ const code=$('netCode').value; if(navigator.clipboard&&code){ navigator.clipboard.writeText(code).then(()=>setNetStatus('房间码已复制：'+code),()=>setNetStatus('房间码：'+code)); } else { setNetStatus('房间码：'+code); } });
 $('netLeave').addEventListener('click',()=>{ netLeave(); ctrl.mode='ai'; refresh(); });
+// ===== 联机增强：聊天 / 表情 / 悔棋应答 =====
+$('chatSend').addEventListener('click', sendChat);
+$('chatInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); sendChat(); } });
+document.querySelectorAll('.chat-emojis button').forEach(b=> b.addEventListener('click', ()=>{ const i=$('chatInput'); i.value=(i.value||'')+b.dataset.em; i.focus(); }));
+$('undoAccept').addEventListener('click', ()=>{ if(!mqClient||!mqClient.connected||!ctrl.online.room) return; mqClient.publish(mqttTopic(ctrl.online.room,'s'), JSON.stringify({t:'undoAck', from:ctrl.online.role}), {qos:1, retain:false}); hideUndoReqBar(); });
+$('undoDeny').addEventListener('click', ()=>{ if(!mqClient||!mqClient.connected||!ctrl.online.room) return; mqClient.publish(mqttTopic(ctrl.online.room,'s'), JSON.stringify({t:'undoDeny', from:ctrl.online.role}), {qos:1, retain:false}); hideUndoReqBar(); });
 
 setHint(hints.xiangqi);
 refresh();
