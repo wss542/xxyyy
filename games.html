@@ -188,7 +188,8 @@ safe-buffer/index.js:
   body.dark .onl-box, body.dark #chatMsgs, body.dark .lobby-item, body.dark .onl-room, body.dark .onl-undo { background:#1c160e; border-color:#4a3a26; }
   body.dark .onl-room .big { color:#e74c3c; }
   body.dark .onl-chat, body.dark .onl-movelog, body.dark .onl-lobby { border-top-color:#4a3a26; }
-body.dark .onl-row input { color:#e8dcc4; background:#2a2218; border-color:#4a3a26; ;-webkit-text-fill-color:#e8dcc4 !important;}
+body.dark .onl-row input, body.dark #netCode, body.dark #netBroker, body.dark #chatInput { color:#e8dcc4 !important; background:#2a2218 !important; border-color:#4a3a26 !important; -webkit-text-fill-color:#e8dcc4 !important; caret-color:#e8dcc4 !important; }
+body.dark .onl-row input:-webkit-autofill, body.dark #netCode:-webkit-autofill { -webkit-text-fill-color:#e8dcc4 !important; -webkit-box-shadow:0 0 0 1000px #2a2218 inset !important; box-shadow:0 0 0 1000px #2a2218 inset !important; }
   body.dark .chat-msgs { background:#1c160e; border-color:#4a3a26; color:#e8dcc4; }
   body.dark .onl-score { background:#33291c; border-color:#4a3a26; color:#e8dcc4; }
   body.dark canvas { background:#3a2e1e; }
@@ -1259,7 +1260,7 @@ const FL = (function () {
     if(!isHuman(color)){ const t=aiChooseToken(color,legalTokens,die,ctrl.difficulty); later(()=>doMoveToken(t),350); }
     else { phase='pick'; render(); }
     netAfterMove(); }
-  function doMoveToken(ti){ pushHistory(); $('undoBtn').disabled=false; phase='busy'; const color=currentColor(); const before=planes[color][ti]; const fromPos=tokenCenter(color,ti); const np=moveToken(color,ti,die); const toPos=tokenCenter(color,ti); lastMoveToken={color,ti}; lastMove={from:fromPos,to:toPos};
+  function doMoveToken(ti){ pushHistory(); $('undoBtn').disabled=false; phase='busy'; const color=currentColor(); const before=planes[color][ti]; const fromPos=tokenCenter(color,ti); const np=moveToken(color,ti,die); const toPos=tokenCenter(color,ti); lastMoveToken={color,ti}; lastMove={pix:1, color:color, ti:ti, before:before, from:[fromPos[0],fromPos[1]], to:[toPos[0],toPos[1]]};
     addLog(color,'掷'+die+' '+(before===-1?'起飞':(np===56?'到达终点!':'前进')));
     if(gameOver){ updateStatus(); render(); netAfterMove(); return; }
     if(die===6) later(()=>{ beginTurn(); netAfterMove(); },500);
@@ -2789,7 +2790,8 @@ function animLastMove(){
   const lm=s.lastMove;
   let fromPos=null, toPos=null, fromCell=null, toCell=null;
   // 统一解析 lastMove → from/to 像素坐标（兼容多种格式）
-  if(g==='backgammon' && typeof lm==='number'){ toPos=m.cellCenter(lm); }
+  if(lm && lm.pix){ fromPos={x:lm.from[0],y:lm.from[1]}; toPos={x:lm.to[0],y:lm.to[1]}; }        // 飞行棋：已存像素坐标
+  else if(g==='backgammon' && typeof lm==='number'){ toPos=m.cellCenter(lm); }
   else if(Array.isArray(lm)){
     if(lm.length===2 && Array.isArray(lm[0])){ fromCell=[lm[0][0],lm[0][1]]; toCell=[lm[1][0],lm[1][1]]; fromPos=m.cellCenter(lm[0][0],lm[0][1]); toPos=m.cellCenter(lm[1][0],lm[1][1]); }
     else if(lm.length===2){ toPos=m.cellCenter(lm[0],lm[1]); }
@@ -2808,9 +2810,16 @@ function animLastMove(){
   if(__animRAF) cancelAnimationFrame(__animRAF);
   // 有位移差 → 滑动动画（棋子从起点滑到终点）
   if(fromPos && (Math.abs(fromPos.x-toPos.x)>3 || Math.abs(fromPos.y-toPos.y)>3)){
-    // 干净滑动：抓一张“终点无子”的干净棋盘快照，动画期间每帧贴回它再画滑动棋子，避免双影；棋盘状态只瞬时改动并立即还原
+    // 干净滑动：抓一张“棋子尚在起点”的干净棋盘快照，动画期间每帧贴回它再画滑动棋子，避免双影；棋盘状态只瞬时改动并立即还原
     let cleanImg=null;
-    if(toCell && s.board && Array.isArray(s.board[toCell[0]]) && s.board[toCell[0]][toCell[1]]){
+    if(lm && lm.pix && lm.color!=null && s.planes && Array.isArray(s.planes[lm.color]) && s.planes[lm.color][lm.ti]!==undefined && lm.before!==undefined){
+      const cur=s.planes[lm.color][lm.ti];
+      s.planes[lm.color][lm.ti]=lm.before;      // 飞行棋：把棋子“退回起点”抓快照
+      m.render();
+      try{ cleanImg=xc.getImageData(0,0,cv.width,cv.height); }catch(e){ cleanImg=null; }
+      s.planes[lm.color][lm.ti]=cur;            // 立即还原到终点位置
+    }
+    else if(toCell && s.board && Array.isArray(s.board[toCell[0]]) && s.board[toCell[0]][toCell[1]]){
       const saved=s.board[toCell[0]][toCell[1]];
       s.board[toCell[0]][toCell[1]]=null;
       m.render();
